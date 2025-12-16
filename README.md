@@ -191,10 +191,6 @@ The application will be available at:
 
 ## 💳 Payment Integration
 
-### Stripe Integration
-- Secure card payments
-- Webhook handling for payment confirmation
-- Support for multiple currencies
 
 ### Chapa Integration
 - Ethiopian payment gateway
@@ -281,14 +277,6 @@ node createAdmin.js
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 👥 Authors
-
-- **Era** - Initial work and development
-
 ## 🙏 Acknowledgments
 
 - React.js community for excellent documentation
@@ -298,7 +286,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 📞 Support
 
-For support, email [your-email@example.com] or create an issue in the repository.
+For support, email [elyasyenealem@gmail.com] or create an issue in the repository.
 
 ---
 
