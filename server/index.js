@@ -18,7 +18,9 @@ import orderRouter from './route/order.route.js'
 const app = express()
 app.use(cors({
     credentials : true,
-    origin : process.env.FRONTEND_URL
+    origin : process.env.NODE_ENV === 'production' 
+        ? [process.env.FRONTEND_URL, 'https://fresh-corner-frontend.onrender.com']
+        : process.env.FRONTEND_URL
 }))
 app.use(express.json())
 app.use(cookieParser())
