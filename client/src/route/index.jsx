@@ -107,6 +107,10 @@ const router = createBrowserRouter([
                 ]
             },
             {
+                path : "product/:product",
+                element : <ProductDisplayPage/>
+            },
+            {
                 path : ":category",
                 children : [
                     {
@@ -114,10 +118,6 @@ const router = createBrowserRouter([
                         element : <ProductListPage/>
                     }
                 ]
-            },
-            {
-                path : "product/:product",
-                element : <ProductDisplayPage/>
             },
             {
                 path : 'cart',

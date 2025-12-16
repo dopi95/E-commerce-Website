@@ -7,6 +7,9 @@ import genertedRefreshToken from '../utils/generatedRefreshToken.js'
 import uploadImageClodinary from '../utils/uploadImageClodinary.js'
 import generatedOtp from '../utils/generatedOtp.js'
 import forgotPasswordTemplate from '../utils/forgotPasswordTemplate.js'
+import welcomeEmailTemplate from '../utils/welcomeEmailTemplate.js'
+import orderConfirmationTemplate from '../utils/orderConfirmationTemplate.js'
+import paymentSuccessTemplate from '../utils/paymentSuccessTemplate.js'
 import jwt from 'jsonwebtoken'
 
 export async function registerUserController(request,response){
@@ -47,12 +50,23 @@ export async function registerUserController(request,response){
 
         const verifyEmail = await sendEmail({
             sendTo : email,
-            subject : "Verify email from binkeyit",
+            subject : "Verify email from Fresh Corner",
             html : verifyEmailTemplate({
                 name,
                 url : VerifyEmailUrl
             })
         })
+
+        // Send welcome email after verification email
+        try {
+            await sendEmail({
+                sendTo : email,
+                subject : "Welcome to Fresh Corner! 🥬",
+                html : welcomeEmailTemplate({ name })
+            })
+        } catch (welcomeEmailError) {
+            console.log('Welcome email failed:', welcomeEmailError.message)
+        }
 
         return response.json({
             message : "User register successfully",
@@ -301,20 +315,29 @@ export async function forgotPasswordController(request,response) {
             forgot_password_expiry : new Date(expireTime).toISOString()
         })
 
-        await sendEmail({
-            sendTo : email,
-            subject : "Forgot password from Binkeyit",
-            html : forgotPasswordTemplate({
-                name : user.name,
-                otp : otp
+        try {
+            await sendEmail({
+                sendTo : email,
+                subject : "Forgot password from Fresh Corner",
+                html : forgotPasswordTemplate({
+                    name : user.name,
+                    otp : otp
+                })
             })
-        })
-
-        return response.json({
-            message : "check your email",
-            error : false,
-            success : true
-        })
+            
+            return response.json({
+                message : "OTP sent to your email",
+                error : false,
+                success : true
+            })
+        } catch (emailError) {
+            console.error('Failed to send email:', emailError.message);
+            return response.status(500).json({
+                message : "Failed to send email. Please try again.",
+                error : true,
+                success : false
+            })
+        }
 
     } catch (error) {
         return response.status(500).json({

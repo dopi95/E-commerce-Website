@@ -1,29 +1,50 @@
-import { Resend } from 'resend';
+import fetch from 'node-fetch';
 import dotenv from 'dotenv'
 dotenv.config()
 
-if(!process.env.RESEND_API){
-    console.log("Provide RESEND_API in side the .env file")
+if(!process.env.BREVO_API_KEY){
+    console.log("Provide BREVO_API_KEY in the .env file")
 }
-
-const resend = new Resend(process.env.RESEND_API);
 
 const sendEmail = async({sendTo, subject, html })=>{
     try {
-        const { data, error } = await resend.emails.send({
-            from: 'Binkeyit <noreply@amitprajapati.co.in>',
-            to: sendTo,
+        console.log('Attempting to send email to:', sendTo);
+        
+        const emailData = {
+            sender: {
+                name: process.env.EMAIL_FROM || "Fresh Corner",
+                email: process.env.BREVO_EMAIL
+            },
+            to: [{
+                email: sendTo
+            }],
             subject: subject,
-            html: html,
+            htmlContent: html
+        };
+        
+        console.log('Sending email via Brevo API...');
+        
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+            method: 'POST',
+            headers: {
+                'api-key': process.env.BREVO_API_KEY,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(emailData)
         });
-
-        if (error) {
-            return console.error({ error });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Brevo API Error:', errorData);
+            throw new Error(`Brevo API Error: ${errorData.message || response.statusText}`);
         }
-
-        return data
+        
+        const result = await response.json();
+        console.log('Email sent successfully:', result);
+        return result;
     } catch (error) {
-        console.log(error)
+        console.error('Email sending failed:', error.message);
+        throw new Error(`Email sending failed: ${error.message}`);
     }
 }
 

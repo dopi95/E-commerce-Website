@@ -68,7 +68,7 @@ const PaymentSuccess = () => {
     };
 
     const handleViewOrders = () => {
-        navigate('/order');
+        navigate('/dashboard/myorders');
     };
 
     if (paymentStatus === 'verifying') {
@@ -101,7 +101,7 @@ const PaymentSuccess = () => {
                                     <span className='font-medium'>Transaction ID:</span> {paymentDetails.tx_ref}
                                 </p>
                                 <p className='text-sm text-gray-600'>
-                                    <span className='font-medium'>Amount:</span> ETB {paymentDetails.amount}
+                                    <span className='font-medium'>Amount:</span> ${paymentDetails.amount}
                                 </p>
                                 <p className='text-sm text-gray-600'>
                                     <span className='font-medium'>Status:</span> {paymentDetails.status}

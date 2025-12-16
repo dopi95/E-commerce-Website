@@ -4,6 +4,9 @@ import CartProductModel from "../models/cartproduct.model.js";
 import OrderModel from "../models/order.model.js";
 import UserModel from "../models/user.model.js";
 import mongoose from "mongoose";
+import sendEmail from '../config/sendEmail.js';
+import orderConfirmationTemplate from '../utils/orderConfirmationTemplate.js';
+import paymentSuccessTemplate from '../utils/paymentSuccessTemplate.js';
 
  export async function CashOnDeliveryOrderController(request,response){
     try {
@@ -32,6 +35,35 @@ import mongoose from "mongoose";
         ///remove from the cart
         const removeCartItems = await CartProductModel.deleteMany({ userId : userId })
         const updateInUser = await UserModel.updateOne({ _id : userId }, { shopping_cart : []})
+
+        // Send order confirmation email
+        try {
+            console.log('🔄 Attempting to send order confirmation email...');
+            const user = await UserModel.findById(userId).populate('address_details');
+            console.log('📧 Sending email to:', user.email);
+            
+            const address = user.address_details.find(addr => addr._id.toString() === addressId);
+            
+            const emailResult = await sendEmail({
+                sendTo: user.email,
+                subject: "Order Confirmed - Fresh Corner 🎉",
+                html: orderConfirmationTemplate({
+                    name: user.name,
+                    orderId: generatedOrder[0].orderId,
+                    items: list_items.map(item => ({
+                        name: item.productId.name,
+                        quantity: item.quantity,
+                        price: item.productId.price
+                    })),
+                    totalAmount: totalAmt,
+                    deliveryAddress: address ? `${address.address_line}, ${address.city}` : 'Default Address'
+                })
+            });
+            console.log('✅ Order confirmation email sent successfully:', emailResult.messageId);
+        } catch (emailError) {
+            console.error('❌ Order confirmation email failed:', emailError.message);
+            console.error('Full error:', emailError);
+        }
 
         return response.json({
             message : "Order successfully",
@@ -176,6 +208,24 @@ export async function webhookStripe(request,response){
                 shopping_cart : []
             })
             const removeCartProductDB = await CartProductModel.deleteMany({ userId : userId})
+            
+            // Send payment success email
+            try {
+                const user = await UserModel.findById(userId);
+                await sendEmail({
+                    sendTo: user.email,
+                    subject: "Payment Successful - Fresh Corner ✅",
+                    html: paymentSuccessTemplate({
+                        name: user.name,
+                        orderId: order[0].orderId,
+                        amount: order[0].totalAmt,
+                        paymentMethod: 'Stripe Card Payment',
+                        transactionId: session.payment_intent
+                    })
+                });
+            } catch (emailError) {
+                console.log('Payment success email failed:', emailError.message);
+            }
         }
       break;
     default:
@@ -283,9 +333,52 @@ export async function telebirrPaymentController(request, response) {
                 totalAmt: totalAmt
             }));
             
-            await OrderModel.insertMany(orderPayload);
+            const generatedOrder = await OrderModel.insertMany(orderPayload);
             await CartProductModel.deleteMany({ userId: userId });
             await UserModel.updateOne({ _id: userId }, { shopping_cart: [] });
+            
+            // Send order confirmation and payment success emails
+            try {
+                const userWithAddress = await UserModel.findById(userId).populate('address_details');
+                const address = userWithAddress.address_details.find(addr => addr._id.toString() === addressId);
+                
+                console.log('🔄 Sending Telebirr order emails...');
+                console.log('📧 Email address:', user.email);
+                
+                // Order confirmation email
+                const orderEmail = await sendEmail({
+                    sendTo: user.email,
+                    subject: "Order Confirmed - Fresh Corner 🎉",
+                    html: orderConfirmationTemplate({
+                        name: user.name,
+                        orderId: generatedOrder[0].orderId,
+                        items: list_items.map(item => ({
+                            name: item.productId.name,
+                            quantity: item.quantity,
+                            price: pricewithDiscount(item.productId.price, item.productId.discount)
+                        })),
+                        totalAmount: totalAmt,
+                        deliveryAddress: address ? `${address.address_line}, ${address.city}` : 'Default Address'
+                    })
+                });
+                console.log('✅ Order email sent:', orderEmail.messageId);
+                
+                // Payment success email
+                const paymentEmail = await sendEmail({
+                    sendTo: user.email,
+                    subject: "Payment Successful - Telebirr ✅",
+                    html: paymentSuccessTemplate({
+                        name: user.name,
+                        orderId: generatedOrder[0].orderId,
+                        amount: totalAmt,
+                        paymentMethod: 'Telebirr',
+                        transactionId: tx_ref
+                    })
+                });
+                console.log('✅ Payment email sent:', paymentEmail.messageId);
+            } catch (emailError) {
+                console.log('Telebirr payment emails failed:', emailError.message);
+            }
             
             return response.json({
                 message: 'Payment initialized successfully',

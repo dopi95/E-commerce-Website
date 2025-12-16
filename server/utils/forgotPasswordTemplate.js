@@ -10,7 +10,7 @@ const forgotPasswordTemplate = ({ name, otp })=>{
     <br/>
     </br>
     <p>Thanks</p>
-    <p>Binkeyit</p>
+    <p>Fresh Corner</p>
 </div>
     `
 }
