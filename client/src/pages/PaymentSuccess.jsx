@@ -13,6 +13,7 @@ const PaymentSuccess = () => {
 
     const tx_ref = searchParams.get('tx_ref');
     const status = searchParams.get('status');
+    const paymentMethod = searchParams.get('method') || 'telebirr';
 
     useEffect(() => {
         if (tx_ref) {
@@ -91,7 +92,7 @@ const PaymentSuccess = () => {
                         <FaCheckCircle className='text-green-500 text-6xl mx-auto mb-4' />
                         <h1 className='text-2xl font-bold text-gray-800 mb-2'>Payment Successful!</h1>
                         <p className='text-gray-600 mb-6'>
-                            Your payment has been processed successfully via Telebirr.
+                            Your payment has been processed successfully via {getPaymentMethodDisplayName(paymentMethod)}.
                         </p>
                         
                         {paymentDetails && (
@@ -102,6 +103,9 @@ const PaymentSuccess = () => {
                                 </p>
                                 <p className='text-sm text-gray-600'>
                                     <span className='font-medium'>Amount:</span> ${paymentDetails.amount}
+                                </p>
+                                <p className='text-sm text-gray-600'>
+                                    <span className='font-medium'>Payment Method:</span> {getPaymentMethodDisplayName(paymentMethod)}
                                 </p>
                                 <p className='text-sm text-gray-600'>
                                     <span className='font-medium'>Status:</span> {paymentDetails.status}
@@ -152,5 +156,18 @@ const PaymentSuccess = () => {
         </div>
     );
 };
+
+// Helper function to get display name for payment methods
+function getPaymentMethodDisplayName(method) {
+    const displayNames = {
+        'telebirr': 'Telebirr',
+        'cbe': 'CBE Birr',
+        'boa': 'Bank of Abyssinia',
+        'dashen': 'Dashen Bank',
+        'zemen': 'Zemen Bank',
+        'awash': 'Awash Bank'
+    };
+    return displayNames[method] || method.toUpperCase();
+}
 
 export default PaymentSuccess;

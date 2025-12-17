@@ -158,6 +158,25 @@ const SummaryApi = {
         url : '/api/user/user-count',
         method : 'get'
     },
+    // Multi-Bank Payment APIs
+    multiBankPayment : {
+        url : '/api/order/payment/initialize',
+        method : 'post'
+    },
+    verifyPayment : {
+        url : '/api/order/payment/verify',
+        method : 'get'
+    },
+    getSupportedBanks : {
+        url : '/api/order/payment/banks',
+        method : 'get'
+    },
+    paymentCallback : {
+        url : '/api/order/payment/callback',
+        method : 'post'
+    },
+    
+    // Legacy Telebirr APIs (for backward compatibility)
     telebirrPayment : {
         url : '/api/order/telebirr/payment',
         method : 'post'

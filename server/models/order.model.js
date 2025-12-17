@@ -26,6 +26,15 @@ const orderSchema = new mongoose.Schema({
         type : String,
         default : ""
     },
+    payment_method : {
+        type : String,
+        enum : ['CASH ON DELIVERY', 'telebirr', 'cbe', 'boa', 'dashen', 'zemen', 'awash'],
+        default : 'CASH ON DELIVERY'
+    },
+    bank_reference : {
+        type : String,
+        default : ""
+    },
     delivery_address : {
         type : mongoose.Schema.ObjectId,
         ref : 'address'

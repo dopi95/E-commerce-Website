@@ -134,16 +134,21 @@ export async function getAllOrdersController(request,response){
     }
 }
 
-// Telebirr Payment Controller
-export async function telebirrPaymentController(request, response) {
+// Multi-Bank Payment Controller (Supports Telebirr + Ethiopian Banks)
+export async function multiBankPaymentController(request, response) {
     try {
         const userId = request.userId;
-        const { list_items, totalAmt, addressId, subTotalAmt, phone_number } = request.body;
+        const { list_items, totalAmt, addressId, subTotalAmt, phone_number, payment_method, bank_account } = request.body;
 
         const user = await UserModel.findById(userId);
         
-        // Generate unique transaction reference
-        const tx_ref = `TXN-${Date.now()}-${userId}`;
+        // Generate unique transaction reference based on payment method
+        let tx_ref;
+        if (payment_method === 'telebirr') {
+            tx_ref = `TXN-${Date.now()}-${userId}`;
+        } else {
+            tx_ref = `BANK-${payment_method.toUpperCase()}-${Date.now()}-${userId}`;
+        }
         
         const paymentData = {
             amount: totalAmt,
@@ -153,15 +158,18 @@ export async function telebirrPaymentController(request, response) {
             last_name: user.name.split(' ')[1] || 'User',
             phone_number: phone_number,
             tx_ref: tx_ref,
-            callback_url: `${process.env.BACKEND_URL}/api/order/telebirr/callback`,
+            payment_method: payment_method,
+            callback_url: `${process.env.BACKEND_URL}/api/order/payment/callback`,
             return_url: `${process.env.FRONTEND_URL}/payment/success`,
             customization: {
                 title: 'Fresh Corner Payment',
-                description: 'Payment for your order'
+                description: `Payment for your order via ${payment_method.toUpperCase()}`
             },
             meta: {
                 userId: userId,
                 addressId: addressId,
+                payment_method: payment_method,
+                bank_account: bank_account || null,
                 items: JSON.stringify(list_items.map(item => ({
                     productId: item.productId._id,
                     name: item.productId.name,
@@ -185,6 +193,7 @@ export async function telebirrPaymentController(request, response) {
                 },
                 paymentId: `REF-${Date.now()}`,
                 payment_status: 'PAID',
+                payment_method: payment_method,
                 delivery_address: addressId,
                 subTotalAmt: pricewithDiscount(item.productId.price, item.productId.discount) * item.quantity,
                 totalAmt: totalAmt
@@ -199,7 +208,8 @@ export async function telebirrPaymentController(request, response) {
                 const userWithAddress = await UserModel.findById(userId).populate('address_details');
                 const address = userWithAddress.address_details.find(addr => addr._id.toString() === addressId);
                 
-                console.log('🔄 Sending Telebirr order emails...');
+                const paymentMethodName = getPaymentMethodDisplayName(payment_method);
+                console.log(`🔄 Sending ${paymentMethodName} order emails...`);
                 console.log('📧 Email address:', user.email);
                 
                 // Order confirmation email
@@ -223,18 +233,18 @@ export async function telebirrPaymentController(request, response) {
                 // Payment success email
                 const paymentEmail = await sendEmail({
                     sendTo: user.email,
-                    subject: "Payment Successful - Telebirr ✅",
+                    subject: `Payment Successful - ${paymentMethodName} ✅`,
                     html: paymentSuccessTemplate({
                         name: user.name,
                         orderId: generatedOrder[0].orderId,
                         amount: totalAmt,
-                        paymentMethod: 'Telebirr',
+                        paymentMethod: paymentMethodName,
                         transactionId: tx_ref
                     })
                 });
                 console.log('✅ Payment email sent:', paymentEmail.messageId);
             } catch (emailError) {
-                console.log('Telebirr payment emails failed:', emailError.message);
+                console.log(`${payment_method} payment emails failed:`, emailError.message);
             }
             
             return response.json({
@@ -243,7 +253,8 @@ export async function telebirrPaymentController(request, response) {
                 success: true,
                 data: {
                     checkout_url: response_data.data.checkout_url,
-                    tx_ref: tx_ref
+                    tx_ref: tx_ref,
+                    payment_method: payment_method
                 }
             });
         } else {
@@ -259,10 +270,30 @@ export async function telebirrPaymentController(request, response) {
     }
 }
 
-// Telebirr Payment Callback Handler
-export async function telebirrCallbackController(request, response) {
+// Legacy Telebirr Payment Controller (for backward compatibility)
+export async function telebirrPaymentController(request, response) {
+    // Add payment_method to request body for compatibility
+    request.body.payment_method = 'telebirr';
+    return multiBankPaymentController(request, response);
+}
+
+// Helper function to get display name for payment methods
+function getPaymentMethodDisplayName(method) {
+    const displayNames = {
+        'telebirr': 'Telebirr',
+        'cbe': 'CBE Birr',
+        'boa': 'Bank of Abyssinia',
+        'dashen': 'Dashen Bank',
+        'zemen': 'Zemen Bank',
+        'awash': 'Awash Bank'
+    };
+    return displayNames[method] || method.toUpperCase();
+}
+
+// Multi-Bank Payment Callback Handler
+export async function paymentCallbackController(request, response) {
     try {
-        const { tx_ref, status, reference } = request.body;
+        const { tx_ref, status, reference, payment_method } = request.body;
         
         if (status === 'success') {
             // Verify the payment
@@ -273,6 +304,7 @@ export async function telebirrCallbackController(request, response) {
                 const userId = meta.userId;
                 const addressId = meta.addressId;
                 const items = JSON.parse(meta.items);
+                const paymentMethodUsed = meta.payment_method || payment_method || 'telebirr';
                 
                 // Create order records
                 const orderPayload = items.map(item => ({
@@ -285,6 +317,7 @@ export async function telebirrCallbackController(request, response) {
                     },
                     paymentId: reference || verification.data.reference,
                     payment_status: 'PAID',
+                    payment_method: paymentMethodUsed,
                     delivery_address: addressId,
                     subTotalAmt: item.price * item.quantity,
                     totalAmt: verification.data.amount
@@ -300,7 +333,11 @@ export async function telebirrCallbackController(request, response) {
                     message: 'Payment verified and order created',
                     error: false,
                     success: true,
-                    data: generatedOrder
+                    data: {
+                        orders: generatedOrder,
+                        payment_method: paymentMethodUsed,
+                        transaction_id: tx_ref
+                    }
                 });
             }
         }
@@ -318,6 +355,12 @@ export async function telebirrCallbackController(request, response) {
             success: false
         });
     }
+}
+
+// Legacy Telebirr Callback Handler (for backward compatibility)
+export async function telebirrCallbackController(request, response) {
+    request.body.payment_method = 'telebirr';
+    return paymentCallbackController(request, response);
 }
 
 // Handle demo payment completion
@@ -351,8 +394,8 @@ export async function handleDemoPaymentCompletion(userId, addressId, cartItems, 
     }
 }
 
-// Verify Telebirr Payment Status
-export async function verifyTelebirrPayment(request, response) {
+// Verify Payment Status (All Methods)
+export async function verifyPaymentStatus(request, response) {
     try {
         const { tx_ref } = request.params;
         
@@ -362,7 +405,36 @@ export async function verifyTelebirrPayment(request, response) {
             message: 'Payment status retrieved',
             error: false,
             success: true,
-            data: verification.data
+            data: {
+                ...verification.data,
+                payment_method: verification.data.payment_method || 'telebirr'
+            }
+        });
+        
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message || error,
+            error: true,
+            success: false
+        });
+    }
+}
+
+// Legacy Telebirr Payment Verification (for backward compatibility)
+export async function verifyTelebirrPayment(request, response) {
+    return verifyPaymentStatus(request, response);
+}
+
+// Get Supported Banks List
+export async function getSupportedBanksController(request, response) {
+    try {
+        const banksData = chapaAPI.getSupportedBanks();
+        
+        return response.json({
+            message: 'Supported banks retrieved successfully',
+            error: false,
+            success: true,
+            data: banksData.data
         });
         
     } catch (error) {

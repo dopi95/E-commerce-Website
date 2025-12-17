@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useGlobalContext } from '../provider/GlobalProvider'
 import { DisplayPriceInRupees } from '../utils/DisplayPriceInRupees'
 import AddAddress from '../components/AddAddress'
-import TelebirrPayment from '../components/TelebirrPayment'
+import MultiBankPayment from '../components/MultiBankPayment'
 import { useSelector } from 'react-redux'
 import AxiosToastError from '../utils/AxiosToastError'
 import Axios from '../utils/Axios'
@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom'
 const CheckoutPage = () => {
   const { notDiscountTotalPrice, totalPrice, totalQty, fetchCartItem,fetchOrder } = useGlobalContext()
   const [openAddress, setOpenAddress] = useState(false)
-  const [openTelebirr, setOpenTelebirr] = useState(false)
+  const [openMultiBank, setOpenMultiBank] = useState(false)
   const addressList = useSelector(state => state.addresses.addressList)
   const [selectAddress, setSelectAddress] = useState(0)
   const cartItemsList = useSelector(state => state.cartItem.cart)
@@ -114,7 +114,7 @@ const CheckoutPage = () => {
             </div>
           </div>
           <div className='w-full flex flex-col gap-4'>
-            <button className='py-2 px-4 bg-orange-600 hover:bg-orange-700 rounded text-white font-semibold' onClick={() => setOpenTelebirr(true)}>
+            <button className='py-2 px-4 border-2 border-yellow-500 font-semibold text-yellow-600 hover:bg-yellow-500 hover:text-white' onClick={() => setOpenMultiBank(true)}>
               Online Payment
             </button>
 
@@ -131,9 +131,9 @@ const CheckoutPage = () => {
       }
 
       {
-        openTelebirr && (
-          <TelebirrPayment 
-            close={() => setOpenTelebirr(false)}
+        openMultiBank && (
+          <MultiBankPayment 
+            close={() => setOpenMultiBank(false)}
             cartItemsList={cartItemsList}
             addressId={addressList[selectAddress]?._id}
             totalPrice={totalPrice}
@@ -143,6 +143,8 @@ const CheckoutPage = () => {
           />
         )
       }
+
+
     </section>
   )
 }
