@@ -1,4 +1,4 @@
-import sendEmail from '../config/sendEmail.js'
+import emailService from '../config/emailService.js'
 import UserModel from '../models/user.model.js'
 import bcryptjs from 'bcryptjs'
 import verifyEmailTemplate from '../utils/verifyEmailTemplate.js'
@@ -48,7 +48,7 @@ export async function registerUserController(request,response){
 
         const VerifyEmailUrl = `${process.env.FRONTEND_URL}/verify-email?code=${save?._id}`
 
-        const verifyEmail = await sendEmail({
+        const verifyEmail = await emailService({
             sendTo : email,
             subject : "Verify email from Fresh Corner",
             html : verifyEmailTemplate({
@@ -59,7 +59,7 @@ export async function registerUserController(request,response){
 
         // Send welcome email after verification email
         try {
-            await sendEmail({
+            await emailService({
                 sendTo : email,
                 subject : "Welcome to Fresh Corner! 🥬",
                 html : welcomeEmailTemplate({ name })
@@ -297,53 +297,94 @@ export async function forgotPasswordController(request,response) {
     try {
         const { email } = request.body 
 
+        // Validate email input
+        if (!email) {
+            return response.status(400).json({
+                message: "Email is required",
+                error: true,
+                success: false
+            })
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return response.status(400).json({
+                message: "Please enter a valid email address",
+                error: true,
+                success: false
+            })
+        }
+
+        console.log('🔍 Looking for user with email:', email);
         const user = await UserModel.findOne({ email })
 
         if(!user){
             return response.status(400).json({
-                message : "Email not available",
+                message : "No account found with this email address",
                 error : true,
                 success : false
             })
         }
 
+        console.log('👤 User found:', user.name);
+        
         const otp = generatedOtp()
-        const expireTime = new Date() + 60 * 60 * 1000 // 1hr
+        const expireTime = new Date().getTime() + 60 * 60 * 1000 // 1hr from now
+
+        console.log('🔢 Generated OTP:', otp);
+        console.log('⏰ OTP expires at:', new Date(expireTime).toISOString());
 
         const update = await UserModel.findByIdAndUpdate(user._id,{
             forgot_password_otp : otp,
             forgot_password_expiry : new Date(expireTime).toISOString()
         })
 
+        console.log('💾 OTP saved to database');
+
         try {
-            await sendEmail({
+            console.log('📧 Attempting to send forgot password email...');
+            
+            await emailService({
                 sendTo : email,
-                subject : "Forgot password from Fresh Corner",
+                subject : "Password Reset - Fresh Corner",
                 html : forgotPasswordTemplate({
                     name : user.name,
                     otp : otp
                 })
             })
             
+            console.log('✅ Forgot password email sent successfully');
+            
             return response.json({
-                message : "OTP sent to your email",
+                message : "Password reset code sent to your email",
                 error : false,
                 success : true
             })
         } catch (emailError) {
-            console.error('Failed to send email:', emailError.message);
+            console.error('❌ Failed to send forgot password email:', emailError.message);
+            
+            // Clear the OTP since email failed
+            await UserModel.findByIdAndUpdate(user._id, {
+                forgot_password_otp: "",
+                forgot_password_expiry: ""
+            })
+            
             return response.status(500).json({
-                message : "Failed to send email. Please try again.",
+                message : "Unable to send reset code. Please check your email address and try again.",
                 error : true,
-                success : false
+                success : false,
+                details: process.env.NODE_ENV === 'development' ? emailError.message : undefined
             })
         }
 
     } catch (error) {
+        console.error('❌ Forgot password controller error:', error.message);
         return response.status(500).json({
-            message : error.message || error,
+            message : "An error occurred. Please try again later.",
             error : true,
-            success : false
+            success : false,
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
         })
     }
 }
