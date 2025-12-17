@@ -10,7 +10,7 @@ A modern, full-stack e-commerce platform for fresh groceries and food items buil
 - **Shopping Cart**: Add/remove items, quantity management, real-time price calculation
 - **Order Management**: Place orders, order history, order tracking
 - **Address Management**: Multiple delivery addresses, address CRUD operations
-- **Payment Integration**: Stripe and Chapa payment gateways
+- **Payment Integration**: Chapa/Telebirr payment gateway for Ethiopian market
 - **Responsive Design**: Mobile-first design with Tailwind CSS
 
 ### Admin Features
@@ -42,8 +42,7 @@ A modern, full-stack e-commerce platform for fresh groceries and food items buil
 - **JWT** - Authentication tokens
 - **bcryptjs** - Password hashing
 - **Cloudinary** - Image storage and management
-- **Stripe** - Payment processing
-- **Chapa** - Ethiopian payment gateway
+- **Chapa** - Ethiopian payment gateway (Telebirr integration)
 - **Resend** - Email service
 - **Multer** - File upload handling
 
@@ -80,8 +79,7 @@ Fresh-Corner/
 - Node.js (v16 or higher)
 - MongoDB
 - Cloudinary account
-- Stripe account (for payments)
-- Chapa account (for Ethiopian payments)
+- Chapa account (for Ethiopian Telebirr payments)
 
 ### Installation
 
@@ -121,15 +119,14 @@ CLOUDINARY_API_SECRET=your_api_secret
 # Email Service (Resend)
 RESEND_API=your_resend_api_key
 
-# Payment Gateways
-STRIPE_SECRET_KEY=your_stripe_secret_key
+# Payment Gateway
 CHAPA_SECRET_KEY=your_chapa_secret_key
 ```
 
 #### Client (.env)
 ```env
 VITE_BACKEND_URL=http://localhost:8080
-VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
+
 ```
 
 ### Running the Application
@@ -191,11 +188,11 @@ The application will be available at:
 
 ## 💳 Payment Integration
 
-
-### Chapa Integration
+### Chapa/Telebirr Integration
 - Ethiopian payment gateway
-- Mobile money and bank transfers
-- Local payment methods
+- Telebirr mobile money integration
+- Local payment methods for Ethiopian market
+- Demo mode for testing purposes
 
 ## 🎨 UI/UX Features
 
@@ -255,19 +252,11 @@ npm run build
 
 ## 🧪 Testing
 
-### Seed Data
-Run the seed script to populate the database with sample data:
-```bash
-cd server
-npm run seed
-```
-
-### Test Users
-Create test users and admin accounts:
-```bash
-node createTestUser.js
-node createAdmin.js
-```
+### Demo Mode
+The application runs in demo mode with:
+- Sample product data
+- Mock payment processing
+- Test user accounts
 
 ## 📝 Contributing
 
