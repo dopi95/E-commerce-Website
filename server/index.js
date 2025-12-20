@@ -51,7 +51,7 @@ app.use('/api/contact',contactRouter)
 
 connectDB().then(()=>{
     app.listen(PORT,()=>{
-        console.log("Server is running",PORT)
+        console.log("Fresh Corner Backend Server is running on port",PORT)
     })
 })
 
