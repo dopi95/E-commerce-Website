@@ -90,6 +90,9 @@ const Header = () => {
 
                                       {/**Desktop**/}
                                     <div className='hidden lg:flex  items-center gap-10'>
+                                        <Link to='/contact' className='text-gray-700 hover:text-green-600 font-medium transition-colors duration-300'>
+                                            Contact
+                                        </Link>
                                         {
                                             user?._id ? (
                                                 <div className='relative'>

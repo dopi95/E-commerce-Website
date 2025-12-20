@@ -1,4 +1,12 @@
 const paymentSuccessTemplate = ({ name, orderId, amount, paymentMethod, transactionId }) => {
+    // Format amount in ETB
+    const formatETB = (price) => {
+        return new Intl.NumberFormat('en-ET', {
+            style: 'currency',
+            currency: 'ETB'
+        }).format(price);
+    };
+
     return `
     <!DOCTYPE html>
     <html>
@@ -23,7 +31,7 @@ const paymentSuccessTemplate = ({ name, orderId, amount, paymentMethod, transact
             <div class="content">
                 <div class="success-box">
                     <h2>🎉 Payment Confirmed!</h2>
-                    <p class="amount">$${amount}</p>
+                    <p class="amount">${formatETB(amount)}</p>
                     <p>Your payment was successful</p>
                 </div>
 
@@ -35,7 +43,7 @@ const paymentSuccessTemplate = ({ name, orderId, amount, paymentMethod, transact
                     <p><strong>Order ID:</strong> #${orderId}</p>
                     <p><strong>Transaction ID:</strong> ${transactionId}</p>
                     <p><strong>Payment Method:</strong> ${paymentMethod}</p>
-                    <p><strong>Amount Paid:</strong> $${amount}</p>
+                    <p><strong>Amount Paid:</strong> ${formatETB(amount)}</p>
                     <p><strong>Status:</strong> <span style="color: #059669; font-weight: bold;">✅ Successful</span></p>
                 </div>
 

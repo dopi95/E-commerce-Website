@@ -1,9 +1,17 @@
 const orderConfirmationTemplate = ({ name, orderId, items, totalAmount, deliveryAddress }) => {
+    // Format amount in ETB
+    const formatETB = (price) => {
+        return new Intl.NumberFormat('en-ET', {
+            style: 'currency',
+            currency: 'ETB'
+        }).format(price);
+    };
+
     const itemsHtml = items.map(item => `
         <tr>
             <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
             <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
-            <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">$${item.price}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">${formatETB(item.price)}</td>
         </tr>
     `).join('');
 
@@ -52,7 +60,7 @@ const orderConfirmationTemplate = ({ name, orderId, items, totalAmount, delivery
                         ${itemsHtml}
                         <tr class="total">
                             <td colspan="2" style="padding: 15px; text-align: right;"><strong>Total Amount:</strong></td>
-                            <td style="padding: 15px; text-align: right;"><strong>$${totalAmount}</strong></td>
+                            <td style="padding: 15px; text-align: right;"><strong>${formatETB(totalAmount)}</strong></td>
                         </tr>
                     </tbody>
                 </table>

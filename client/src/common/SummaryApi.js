@@ -184,6 +184,38 @@ const SummaryApi = {
     verifyTelebirrPayment : {
         url : '/api/order/telebirr/verify',
         method : 'get'
+    },
+    
+    // Contact APIs
+    submitContact : {
+        url : '/api/contact/submit',
+        method : 'post'
+    },
+    getAllContacts : {
+        url : '/api/contact/get',
+        method : 'get'
+    },
+    updateContactStatus : {
+        url : '/api/contact/update-status',
+        method : 'put'
+    },
+    replyToContact : {
+        url : '/api/contact/reply',
+        method : 'post'
+    },
+    deleteContact : {
+        url : '/api/contact/delete',
+        method : 'delete'
+    },
+    
+    // User Management APIs
+    getAllUsers : {
+        url : '/api/user/all-users',
+        method : 'get'
+    },
+    deleteUser : {
+        url : '/api/user/delete',
+        method : 'delete'
     }
 }
 

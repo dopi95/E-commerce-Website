@@ -601,3 +601,72 @@ export async function getUserCount(request,response){
         })
     }
 }
+
+// Get all users (Admin only)
+export async function getAllUsersController(request, response) {
+    try {
+        const users = await UserModel.find({}).select('-password -refresh_token').sort({ createdAt: -1 });
+
+        return response.json({
+            message: 'All users retrieved successfully',
+            data: users,
+            error: false,
+            success: true
+        });
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message || error,
+            error: true,
+            success: false
+        });
+    }
+}
+
+// Delete user (Admin only)
+export async function deleteUserController(request, response) {
+    try {
+        const { userId } = request.params;
+        const adminUserId = request.userId;
+
+        // Prevent admin from deleting themselves
+        if (userId === adminUserId) {
+            return response.status(400).json({
+                message: "You cannot delete your own account",
+                error: true,
+                success: false
+            });
+        }
+
+        const userToDelete = await UserModel.findById(userId);
+        if (!userToDelete) {
+            return response.status(404).json({
+                message: "User not found",
+                error: true,
+                success: false
+            });
+        }
+
+        // Prevent deleting other admins
+        if (userToDelete.role === 'ADMIN') {
+            return response.status(400).json({
+                message: "Cannot delete admin users",
+                error: true,
+                success: false
+            });
+        }
+
+        await UserModel.findByIdAndDelete(userId);
+
+        return response.json({
+            message: "User deleted successfully",
+            error: false,
+            success: true
+        });
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message || error,
+            error: true,
+            success: false
+        });
+    }
+}

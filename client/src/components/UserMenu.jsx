@@ -10,6 +10,7 @@ import AxiosToastError from '../utils/AxiosToastError'
 import { HiOutlineExternalLink } from "react-icons/hi";
 import isAdmin from '../utils/isAdmin'
 import logo from '../assets/logo.png'
+import UsersAdmin from '../pages/UsersAdmin';
 
 const UserMenu = ({close}) => {
    const user = useSelector((state)=> state.user)
@@ -99,6 +100,18 @@ const UserMenu = ({close}) => {
             {
               isAdmin(user.role) && (
                 <Link onClick={handleClose} to={"/dashboard/orders"} className='px-2 hover:bg-orange-200 py-1'>All Orders</Link>
+              )
+            }
+
+            {
+              isAdmin(user.role) && (
+                <Link onClick={handleClose} to={"/dashboard/contacts"} className='px-2 hover:bg-orange-200 py-1'>Contact Messages</Link>
+              )
+            }
+
+            {
+              isAdmin(user.role) && (
+                <Link onClick={handleClose} to={"/dashboard/users"} className='px-2 hover:bg-orange-200 py-1'>Users</Link>
               )
             }
 

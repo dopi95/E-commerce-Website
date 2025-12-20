@@ -2,6 +2,7 @@ import React from 'react'
 import { FaFacebook } from "react-icons/fa";
 import { FaInstagram } from "react-icons/fa";
 import { FaLinkedin } from "react-icons/fa";
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
@@ -12,16 +13,21 @@ const Footer = () => {
                     <p>© 2025 Fresh Corner. All Rights Reserved.</p>
                 </div>
                 
-                <div className='flex items-center gap-8'>
-                    <a href='#' className='text-gray-600 hover:text-blue-600 transform hover:scale-110 transition-all duration-300'>
-                        <FaFacebook size={24}/>
-                    </a>
-                    <a href='#' className='text-gray-600 hover:text-pink-500 transform hover:scale-110 transition-all duration-300'>
-                        <FaInstagram size={24}/>
-                    </a>
-                    <a href='#' className='text-gray-600 hover:text-blue-700 transform hover:scale-110 transition-all duration-300'>
-                        <FaLinkedin size={24}/>
-                    </a>
+                <div className='flex items-center gap-6'>
+                    <Link to='/contact' className='text-gray-600 hover:text-green-600 font-medium transition-colors duration-300'>
+                        Contact Us
+                    </Link>
+                    <div className='flex items-center gap-4'>
+                        <a href='#' className='text-gray-600 hover:text-blue-600 transform hover:scale-110 transition-all duration-300'>
+                            <FaFacebook size={24}/>
+                        </a>
+                        <a href='#' className='text-gray-600 hover:text-pink-500 transform hover:scale-110 transition-all duration-300'>
+                            <FaInstagram size={24}/>
+                        </a>
+                        <a href='#' className='text-gray-600 hover:text-blue-700 transform hover:scale-110 transition-all duration-300'>
+                            <FaLinkedin size={24}/>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

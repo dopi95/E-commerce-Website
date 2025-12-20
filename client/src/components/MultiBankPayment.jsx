@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import Axios from '../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
 import AxiosToastError from '../utils/AxiosToastError';
+import { DisplayPriceInRupees } from '../utils/DisplayPriceInRupees';
 import telebirrLogo from '../assets/telebirrlogo.png';
 import cbeLogo from '../assets/cbe.png';
 import boaLogo from '../assets/boa.png';
@@ -118,7 +119,7 @@ const MultiBankPayment = ({
                 formattedPhone = '+251' + phoneNumber;
             }
 
-            if (!formattedPhone.match(/^\\+251[79]\\d{8}$/)) {
+            if (!formattedPhone.match(/^\+251[79]\d{8}$/)) {
                 toast.error('Please enter a valid Ethiopian phone number (9xxxxxxxx)');
                 return;
             }
@@ -258,7 +259,7 @@ const MultiBankPayment = ({
             <div className='bg-gray-50 p-3 rounded-md mt-6'>
                 <div className='flex justify-between text-sm'>
                     <span>Total Amount:</span>
-                    <span className='font-semibold'>${totalPrice}</span>
+                    <span className='font-semibold'>{DisplayPriceInRupees(totalPrice)}</span>
                 </div>
             </div>
         </div>
@@ -327,7 +328,7 @@ const MultiBankPayment = ({
             <div className='bg-gray-50 p-3 rounded-md mb-4'>
                 <div className='flex justify-between text-sm'>
                     <span>Total Amount:</span>
-                    <span className='font-semibold'>${totalPrice}</span>
+                    <span className='font-semibold'>{DisplayPriceInRupees(totalPrice)}</span>
                 </div>
             </div>
         </div>

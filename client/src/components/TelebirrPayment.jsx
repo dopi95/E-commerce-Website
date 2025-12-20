@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import Axios from '../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
 import AxiosToastError from '../utils/AxiosToastError';
+import { DisplayPriceInRupees } from '../utils/DisplayPriceInRupees';
 import telebirrLogo from '../assets/telebirrlogo.png';
 
 const TelebirrPayment = ({ 
@@ -142,7 +143,7 @@ const TelebirrPayment = ({
             <div className='bg-gray-50 p-3 rounded-md mt-6'>
                 <div className='flex justify-between text-sm'>
                     <span>Total Amount:</span>
-                    <span className='font-semibold'>${totalPrice}</span>
+                    <span className='font-semibold'>{DisplayPriceInRupees(totalPrice)}</span>
                 </div>
             </div>
         </div>
@@ -187,7 +188,7 @@ const TelebirrPayment = ({
             <div className='bg-gray-50 p-3 rounded-md mb-4'>
                 <div className='flex justify-between text-sm'>
                     <span>Total Amount:</span>
-                    <span className='font-semibold'>${totalPrice}</span>
+                    <span className='font-semibold'>{DisplayPriceInRupees(totalPrice)}</span>
                 </div>
             </div>
         </div>

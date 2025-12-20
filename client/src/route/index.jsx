@@ -26,6 +26,9 @@ import Cancel from "../pages/Cancel";
 import PaymentSuccess from "../pages/PaymentSuccess";
 import AdminDashboard from "../pages/AdminDashboard";
 import AllOrders from "../pages/AllOrders";
+import Contact from "../pages/Contact";
+import ContactAdmin from "../pages/ContactAdmin";
+import UsersAdmin from "../pages/UsersAdmin";
 
 const router = createBrowserRouter([
     {
@@ -103,8 +106,20 @@ const router = createBrowserRouter([
                     {
                         path : 'orders',
                         element : <AdminPermision><AllOrders/></AdminPermision>
+                    },
+                    {
+                        path : 'contacts',
+                        element : <AdminPermision><ContactAdmin/></AdminPermision>
+                    },
+                    {
+                        path : 'users',
+                        element : <AdminPermision><UsersAdmin/></AdminPermision>
                     }
                 ]
+            },
+            {
+                path : "contact",
+                element : <Contact/>
             },
             {
                 path : "product/:product",
