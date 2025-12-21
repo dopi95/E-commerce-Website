@@ -1,66 +1,23 @@
-import sendEmailResend from './sendEmailResend.js'
 import sendEmail from './sendEmail.js'
-import sendEmailSMTP from './sendEmailSMTP.js'
-import sendEmailNodemailer from './sendEmailNodemailer.js'
 import dotenv from 'dotenv'
 dotenv.config()
 
 const emailService = async ({ sendTo, subject, html }) => {
     try {
-        // Try Gmail SMTP first (most reliable)
-        if (process.env.GMAIL_EMAIL && process.env.GMAIL_APP_PASSWORD) {
-            console.log('🔄 Attempting to send email via Gmail SMTP...')
-            try {
-                const result = await sendEmailNodemailer({ sendTo, subject, html })
-                console.log('✅ Email sent successfully via Gmail SMTP')
-                return result
-            } catch (gmailError) {
-                console.log('⚠️ Gmail SMTP failed, trying Brevo...', gmailError.message)
-            }
-        }
-
-        // Try Resend second
-        if (process.env.RESEND_API_KEY && process.env.RESEND_API_KEY !== 're_123456789_your_resend_api_key_here') {
-            console.log('🔄 Attempting to send email via Resend...')
-            try {
-                const result = await sendEmailResend({ sendTo, subject, html })
-                console.log('✅ Email sent successfully via Resend')
-                return result
-            } catch (resendError) {
-                console.log('⚠️ Resend failed, trying Brevo...', resendError.message)
-            }
-        }
-
-        // Fallback to Brevo
+        // Use only Brevo email service
         if (process.env.BREVO_API_KEY) {
-            console.log('🔄 Attempting to send email via Brevo...')
-            try {
-                const result = await sendEmail({ sendTo, subject, html })
-                console.log('✅ Email sent successfully via Brevo')
-                return result
-            } catch (brevoError) {
-                console.log('⚠️ Brevo failed, trying SMTP...', brevoError.message)
-            }
+            console.log('🔄 Sending email via Brevo...')
+            const result = await sendEmail({ sendTo, subject, html })
+            console.log('✅ Email sent successfully via Brevo')
+            return result
         }
 
-        // Fallback to SMTP
-        if (process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD) {
-            console.log('🔄 Attempting to send email via SMTP...')
-            try {
-                const result = await sendEmailSMTP({ sendTo, subject, html })
-                console.log('✅ Email sent successfully via SMTP')
-                return result
-            } catch (smtpError) {
-                console.log('⚠️ SMTP also failed:', smtpError.message)
-            }
-        }
-
-        throw new Error('No email service configured properly')
+        throw new Error('Brevo API key not configured')
 
     } catch (error) {
-        console.error('❌ All email services failed:', error.message)
+        console.error('❌ Brevo email service failed:', error.message)
         
-        // For development, we can simulate success
+        // For development, simulate success
         if (process.env.NODE_ENV === 'development') {
             console.log('🔧 Development mode: Simulating email success')
             console.log('📧 Would send email to:', sendTo)
