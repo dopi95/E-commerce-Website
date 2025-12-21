@@ -72,7 +72,7 @@ const Home = () => {
                           </span>
                       </h1>
                       
-                      <p className='text-sm lg:text-base text-gray-800 max-w-2xl mx-auto'>
+                      <p className='text-sm lg:text-base max-w-2xl mx-auto' style={{color: '#1f2937'}}>
                           Discover fresh, high-quality groceries delivered to your door. From farm-fresh produce to everyday essentials.
                       </p>
                       
@@ -94,7 +94,7 @@ const Home = () => {
                       
                       {/* Features */}
                       <div className='grid grid-cols-3 sm:grid-cols-3 gap-4 pt-4 max-w-3xl mx-auto'>
-                          <div className='flex flex-col items-center gap-2 text-gray-800'>
+                          <div className='flex flex-col items-center gap-2' style={{color: '#1f2937'}}>
                               <div className='w-10 h-10 bg-green-100 rounded-full flex items-center justify-center'>
                                   <FaTruck className='text-green-600' />
                               </div>
@@ -103,7 +103,7 @@ const Home = () => {
                                   <p className='text-xs'>Within 30 minutes</p>
                               </div>
                           </div>
-                          <div className='flex flex-col items-center gap-2 text-gray-800'>
+                          <div className='flex flex-col items-center gap-2' style={{color: '#1f2937'}}>
                               <div className='w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center'>
                                   <FaLeaf className='text-yellow-600' />
                               </div>
@@ -112,7 +112,7 @@ const Home = () => {
                                   <p className='text-xs'>Farm to table</p>
                               </div>
                           </div>
-                          <div className='flex flex-col items-center gap-2 text-gray-800'>
+                          <div className='flex flex-col items-center gap-2' style={{color: '#1f2937'}}>
                               <div className='w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center'>
                                   <div className='text-blue-600'>💰</div>
                               </div>
@@ -131,7 +131,7 @@ const Home = () => {
       <div className='container mx-auto px-4 py-8 lg:py-12'>
           <div className='text-center mb-8 lg:mb-10'>
               <h2 className='text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 lg:mb-3'>Shop by Category</h2>
-              <p className='text-gray-800 text-base lg:text-lg max-w-2xl mx-auto'>Select a category to explore fresh products</p>
+              <p className='text-base lg:text-lg max-w-2xl mx-auto' style={{color: '#1f2937'}}>Select a category to explore fresh products</p>
           </div>
           
           <div className='max-w-md mx-auto relative'>
