@@ -1,12 +1,25 @@
 import sendEmailResend from './sendEmailResend.js'
 import sendEmail from './sendEmail.js'
 import sendEmailSMTP from './sendEmailSMTP.js'
+import sendEmailNodemailer from './sendEmailNodemailer.js'
 import dotenv from 'dotenv'
 dotenv.config()
 
 const emailService = async ({ sendTo, subject, html }) => {
     try {
-        // Try Resend first (no IP restrictions)
+        // Try Gmail SMTP first (most reliable)
+        if (process.env.GMAIL_EMAIL && process.env.GMAIL_APP_PASSWORD) {
+            console.log('🔄 Attempting to send email via Gmail SMTP...')
+            try {
+                const result = await sendEmailNodemailer({ sendTo, subject, html })
+                console.log('✅ Email sent successfully via Gmail SMTP')
+                return result
+            } catch (gmailError) {
+                console.log('⚠️ Gmail SMTP failed, trying Brevo...', gmailError.message)
+            }
+        }
+
+        // Try Resend second
         if (process.env.RESEND_API_KEY && process.env.RESEND_API_KEY !== 're_123456789_your_resend_api_key_here') {
             console.log('🔄 Attempting to send email via Resend...')
             try {
