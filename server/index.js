@@ -20,7 +20,7 @@ const app = express()
 app.use(cors({
     credentials : true,
     origin : process.env.NODE_ENV === 'production' 
-        ? ['https://e-commerce-website-frontend-dcxl.onrender.com']
+        ? ['https://freshcorner.vercel.app', 'https://fresh-corner-backend.onrender.com']
         : process.env.FRONTEND_URL
 }))
 app.use(express.json())
