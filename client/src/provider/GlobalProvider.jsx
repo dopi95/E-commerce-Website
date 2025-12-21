@@ -23,6 +23,11 @@ const GlobalProvider = ({children}) => {
 
     const fetchCartItem = async()=>{
         try {
+          const accessToken = localStorage.getItem('accesstoken')
+          if(!accessToken){
+            return
+          }
+          
           const response = await Axios({
             ...SummaryApi.getCartItem
           })
@@ -30,11 +35,10 @@ const GlobalProvider = ({children}) => {
     
           if(responseData.success){
             dispatch(handleAddItemCart(responseData.data))
-            console.log(responseData)
           }
     
         } catch (error) {
-          console.log(error)
+          // Silent fail for unauthenticated users
         }
     }
 
@@ -104,6 +108,11 @@ const GlobalProvider = ({children}) => {
 
     const fetchAddress = async()=>{
       try {
+        const accessToken = localStorage.getItem('accesstoken')
+        if(!accessToken){
+          return
+        }
+        
         const response = await Axios({
           ...SummaryApi.getAddress
         })
@@ -113,11 +122,16 @@ const GlobalProvider = ({children}) => {
           dispatch(handleAddAddress(responseData.data))
         }
       } catch (error) {
-          // AxiosToastError(error)
+          // Silent fail for unauthenticated users
       }
     }
     const fetchOrder = async()=>{
       try {
+        const accessToken = localStorage.getItem('accesstoken')
+        if(!accessToken){
+          return
+        }
+        
         const response = await Axios({
           ...SummaryApi.getOrderItems,
         })
@@ -127,15 +141,17 @@ const GlobalProvider = ({children}) => {
             dispatch(setOrder(responseData.data))
         }
       } catch (error) {
-        console.log(error)
+        // Silent fail for unauthenticated users
       }
     }
 
     useEffect(()=>{
-      fetchCartItem()
-      handleLogoutOut()
-      fetchAddress()
-      fetchOrder()
+      const accessToken = localStorage.getItem('accesstoken')
+      if(accessToken && user?._id){
+        fetchCartItem()
+        fetchAddress()
+        fetchOrder()
+      }
     },[user])
     
     return(

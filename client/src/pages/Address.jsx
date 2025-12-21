@@ -47,7 +47,7 @@ const Address = () => {
               {
                 addressList.map((address,index)=>{
                   return(
-                      <div className={`border rounded p-3 flex gap-3 bg-white ${!address.status && 'hidden'}`}>
+                      <div key={address._id || index} className={`border rounded p-3 flex gap-3 bg-white ${!address.status && 'hidden'}`}>
                           <div className='w-full'>
                             <p>{address.address_line}</p>
                             <p>{address.city}</p>

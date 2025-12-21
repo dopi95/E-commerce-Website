@@ -14,28 +14,29 @@ const CartMobileLink = () => {
     <>
         {
             cartItem[0] && (
-            <div className='sticky bottom-4 p-2'>
-            <div className='bg-green-600 px-2 py-1 rounded text-neutral-100 text-sm  flex items-center justify-between gap-3 lg:hidden'>
-                    <div className='flex items-center gap-2'>
-                        <div className='p-2 bg-green-500 rounded w-fit'>
-                            <FaCartShopping/>
+            <div className='fixed bottom-4 left-4 right-4 z-30 lg:hidden'>
+                <div className='bg-gradient-to-r from-green-600 to-green-700 px-4 py-3 rounded-2xl text-white shadow-2xl border border-green-500/20 backdrop-blur-sm'>
+                    <div className='flex items-center justify-between'>
+                        <div className='flex items-center gap-3'>
+                            <div className='p-2 bg-white/20 rounded-xl backdrop-blur-sm'>
+                                <FaCartShopping size={18} className='text-white'/>
+                            </div>
+                            <div className='text-sm'>
+                                <p className='font-semibold'>{totalQty} items</p>
+                                <p className='text-green-100 font-medium'>{DisplayPriceInRupees(totalPrice)}</p>
+                            </div>
                         </div>
-                        <div className='text-xs'>
-                                <p>{totalQty} items</p>
-                                <p>{DisplayPriceInRupees(totalPrice)}</p>
-                        </div>
-                    </div>
 
-                    <Link to={"/cart"} className='flex items-center gap-1'>
-                        <span className='text-sm'>View Cart</span>
-                        <FaCaretRight/>
-                    </Link>
+                        <Link to={"/cart"} className='flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl transition-all duration-200 backdrop-blur-sm'>
+                            <span className='font-semibold text-sm'>View Cart</span>
+                            <FaCaretRight size={16}/>
+                        </Link>
+                    </div>
                 </div>
             </div>
             )
         }
     </>
-    
   )
 }
 

@@ -44,92 +44,129 @@ const UserMenu = ({close}) => {
       }
    }
   return (
-    <div>
-        {isAdmin(user.role) && (
-            <div className='mb-4 pb-4 border-b'>
-                <Link to="/dashboard" className='flex items-center gap-2'>
-                    <img src={logo} alt='Fresh Corner Logo' className='h-8 w-8' />
-                    <h1 className='text-lg font-bold'>
-                        <span className='text-green-600'>Fresh</span>
-                        <span className='text-yellow-500'> Corner</span>
-                    </h1>
-                </Link>
-            </div>
-        )}
-        <div className='font-semibold'>My Account</div>
-        <div className='text-sm flex items-center gap-2'>
-          <span className='max-w-52 text-ellipsis line-clamp-1'>{user.name || user.mobile} <span className='text-medium text-red-600'>{user.role === "ADMIN" ? "(Admin)" : "" }</span></span>
-          <Link onClick={handleClose} to={"/dashboard/profile"} className='hover:text-primary-200'>
-            <HiOutlineExternalLink size={15}/>
-          </Link>
-        </div>
-
-        <Divider/>
-
-        <div className='text-sm grid gap-1'>
-            {
-              isAdmin(user.role) && (
-                <Link onClick={handleClose} to={"/dashboard"} className='px-2 hover:bg-orange-200 py-1 font-semibold text-blue-600'>Admin Dashboard</Link>
-              )
-            }
-
-            {
-              isAdmin(user.role) && (
-                <Link onClick={handleClose} to={"/dashboard/category"} className='px-2 hover:bg-orange-200 py-1'>Category</Link>
-              )
-            }
-
-            {
-              isAdmin(user.role) && (
-                <Link onClick={handleClose} to={"/dashboard/subcategory"} className='px-2 hover:bg-orange-200 py-1'>Sub Category</Link>
-              )
-            }
-
-            {
-              isAdmin(user.role) && (
-                <Link onClick={handleClose} to={"/dashboard/upload-product"} className='px-2 hover:bg-orange-200 py-1'>Upload Product</Link>
-              )
-            }
-
-            {
-              isAdmin(user.role) && (
-                <Link onClick={handleClose} to={"/dashboard/product"} className='px-2 hover:bg-orange-200 py-1'>Product</Link>
-              )
-            }
-
-            {
-              isAdmin(user.role) && (
-                <Link onClick={handleClose} to={"/dashboard/orders"} className='px-2 hover:bg-orange-200 py-1'>All Orders</Link>
-              )
-            }
-
-            {
-              isAdmin(user.role) && (
-                <Link onClick={handleClose} to={"/dashboard/contacts"} className='px-2 hover:bg-orange-200 py-1'>Contact Messages</Link>
-              )
-            }
-
-            {
-              isAdmin(user.role) && (
-                <Link onClick={handleClose} to={"/dashboard/users"} className='px-2 hover:bg-orange-200 py-1'>Users</Link>
-              )
-            }
-
-            {!isAdmin(user.role) && (
-              <>
-                <Link onClick={handleClose} to={"/dashboard/myorders"} className='px-2 hover:bg-orange-200 py-1'>My Orders</Link>
-                <Link onClick={handleClose} to={"/dashboard/address"} className='px-2 hover:bg-orange-200 py-1'>Save Address</Link>
-              </>
+    <div className='lg:block'>
+        {/* Desktop Menu */}
+        <div className='hidden lg:block'>
+            {isAdmin(user.role) && (
+                <div className='mb-4 pb-4 border-b'>
+                    <Link to="/dashboard" className='flex items-center gap-2'>
+                        <img src={logo} alt='Fresh Corner Logo' className='h-8 w-8' />
+                        <h1 className='text-lg font-bold'>
+                            <span className='text-green-600'>Fresh</span>
+                            <span className='text-yellow-500'> Corner</span>
+                        </h1>
+                    </Link>
+                </div>
             )}
+            <div className='font-semibold'>My Account</div>
+            <div className='text-sm flex items-center gap-2'>
+              <span className='max-w-52 text-ellipsis line-clamp-1'>{user.name || user.mobile} <span className='text-medium text-red-600'>{user.role === "ADMIN" ? "(Admin)" : "" }</span></span>
+              <Link onClick={handleClose} to={"/dashboard/profile"} className='hover:text-primary-200'>
+                <HiOutlineExternalLink size={15}/>
+              </Link>
+            </div>
 
-            {
-              isAdmin(user.role) && (
-                <Link onClick={handleClose} to={"/"} className='mx-2 mt-4 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors duration-200 font-medium text-center border border-green-300'>← Back to Website</Link>
-              )
-            }
+            <Divider/>
 
-            <button onClick={handleLogout} className='mx-2 mt-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors duration-200 font-medium border border-red-300'>Log Out</button>
+            <div className='text-sm grid gap-1'>
+                {
+                  isAdmin(user.role) && (
+                    <Link onClick={handleClose} to={"/dashboard"} className='px-2 hover:bg-orange-200 py-1 font-semibold text-blue-600'>Admin Dashboard</Link>
+                  )
+                }
 
+                {
+                  isAdmin(user.role) && (
+                    <Link onClick={handleClose} to={"/dashboard/category"} className='px-2 hover:bg-orange-200 py-1'>Category</Link>
+                  )
+                }
+
+                {
+                  isAdmin(user.role) && (
+                    <Link onClick={handleClose} to={"/dashboard/subcategory"} className='px-2 hover:bg-orange-200 py-1'>Sub Category</Link>
+                  )
+                }
+
+                {
+                  isAdmin(user.role) && (
+                    <Link onClick={handleClose} to={"/dashboard/upload-product"} className='px-2 hover:bg-orange-200 py-1'>Upload Product</Link>
+                  )
+                }
+
+                {
+                  isAdmin(user.role) && (
+                    <Link onClick={handleClose} to={"/dashboard/product"} className='px-2 hover:bg-orange-200 py-1'>Product</Link>
+                  )
+                }
+
+                {
+                  isAdmin(user.role) && (
+                    <Link onClick={handleClose} to={"/dashboard/orders"} className='px-2 hover:bg-orange-200 py-1'>All Orders</Link>
+                  )
+                }
+
+                {
+                  isAdmin(user.role) && (
+                    <Link onClick={handleClose} to={"/dashboard/contacts"} className='px-2 hover:bg-orange-200 py-1'>Contact Messages</Link>
+                  )
+                }
+
+                {
+                  isAdmin(user.role) && (
+                    <Link onClick={handleClose} to={"/dashboard/users"} className='px-2 hover:bg-orange-200 py-1'>Users</Link>
+                  )
+                }
+
+                {!isAdmin(user.role) && (
+                  <>
+                    <Link onClick={handleClose} to={"/dashboard/myorders"} className='px-2 hover:bg-orange-200 py-1'>My Orders</Link>
+                    <Link onClick={handleClose} to={"/dashboard/address"} className='px-2 hover:bg-orange-200 py-1'>Save Address</Link>
+                  </>
+                )}
+
+                {
+                  isAdmin(user.role) && (
+                    <Link onClick={handleClose} to={"/"} className='mx-2 mt-4 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors duration-200 font-medium text-center border border-green-300'>← Back to Website</Link>
+                  )
+                }
+
+                <button onClick={handleLogout} className='mx-2 mt-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors duration-200 font-medium border border-red-300'>Log Out</button>
+            </div>
+        </div>
+        
+        {/* Mobile Menu */}
+        <div className='lg:hidden flex justify-around items-center py-2 px-4'>
+            {!isAdmin(user.role) ? (
+                <>
+                    <Link to={"/dashboard/profile"} className='flex flex-col items-center gap-1 p-2 text-gray-600 hover:text-green-600'>
+                        <div className='text-xs font-medium'>Profile</div>
+                    </Link>
+                    <Link to={"/dashboard/myorders"} className='flex flex-col items-center gap-1 p-2 text-gray-600 hover:text-green-600'>
+                        <div className='text-xs font-medium'>Orders</div>
+                    </Link>
+                    <Link to={"/dashboard/address"} className='flex flex-col items-center gap-1 p-2 text-gray-600 hover:text-green-600'>
+                        <div className='text-xs font-medium'>Address</div>
+                    </Link>
+                    <button onClick={handleLogout} className='flex flex-col items-center gap-1 p-2 text-red-600 hover:text-red-700'>
+                        <div className='text-xs font-medium'>Logout</div>
+                    </button>
+                </>
+            ) : (
+                <>
+                    <Link to={"/dashboard"} className='flex flex-col items-center gap-1 p-2 text-gray-600 hover:text-green-600'>
+                        <div className='text-xs font-medium'>Dashboard</div>
+                    </Link>
+                    <Link to={"/dashboard/product"} className='flex flex-col items-center gap-1 p-2 text-gray-600 hover:text-green-600'>
+                        <div className='text-xs font-medium'>Products</div>
+                    </Link>
+                    <Link to={"/dashboard/orders"} className='flex flex-col items-center gap-1 p-2 text-gray-600 hover:text-green-600'>
+                        <div className='text-xs font-medium'>Orders</div>
+                    </Link>
+                    <button onClick={handleLogout} className='flex flex-col items-center gap-1 p-2 text-red-600 hover:text-red-700'>
+                        <div className='text-xs font-medium'>Logout</div>
+                    </button>
+                </>
+            )}
         </div>
     </div>
   )

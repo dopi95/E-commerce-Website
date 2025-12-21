@@ -65,7 +65,7 @@ const CheckoutPage = () => {
             {
               addressList.map((address, index) => {
                 return (
-                  <label htmlFor={"address" + index} className={!address.status && "hidden"}>
+                  <label key={address._id || index} htmlFor={"address" + index} className={!address.status ? "hidden" : ""}>
                     <div className='border rounded p-3 flex gap-3 hover:bg-blue-50'>
                       <div>
                         <input id={"address" + index} type='radio' value={index} onChange={(e) => setSelectAddress(e.target.value)} name='address' />

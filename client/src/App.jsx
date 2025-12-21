@@ -1,5 +1,6 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import './App.css'
+import './styles/animations.css'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import toast, { Toaster } from 'react-hot-toast';
@@ -22,7 +23,9 @@ function App() {
 
   const fetchUser = async()=>{
       const userData = await fetchUserDetails()
-      dispatch(setUserDetails(userData.data))
+      if(userData?.data){
+        dispatch(setUserDetails(userData.data))
+      }
   }
 
   const fetchCategory = async()=>{
@@ -71,7 +74,7 @@ function App() {
   return (
     <GlobalProvider> 
       <Header/>
-      <main className={`bg-white ${location.pathname.includes('/dashboard') ? 'min-h-screen' : 'min-h-[78vh] pt-24 lg:pt-20'}`}>
+      <main className={`bg-white ${location.pathname.includes('/dashboard') ? 'min-h-screen' : 'min-h-[78vh] pt-16 lg:pt-20'}`}>
           <Outlet/>
       </main>
       {!location.pathname.includes('/dashboard') && <Footer/>}

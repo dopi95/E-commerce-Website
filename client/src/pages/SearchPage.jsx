@@ -7,6 +7,7 @@ import CardProduct from '../components/CardProduct'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useLocation } from 'react-router-dom'
 import noDataImage from '../assets/nothing here yet.webp'
+import { useSelector } from 'react-redux'
 
 const SearchPage = () => {
   const [data,setData] = useState([])
@@ -14,8 +15,10 @@ const SearchPage = () => {
   const loadingArrayCard = new Array(10).fill(null)
   const [page,setPage] = useState(1)
   const [totalPage,setTotalPage] = useState(1)
+  const [selectedCategory, setSelectedCategory] = useState('')
   const params = useLocation()
   const searchText = params?.search?.slice(3)
+  const categoryData = useSelector(state => state.product.allCategory)
 
   const fetchData = async() => {
     try {
@@ -42,7 +45,6 @@ const SearchPage = () => {
               })
             }
             setTotalPage(responseData.totalPage)
-            console.log(responseData)
         }
     } catch (error) {
         AxiosToastError(error)
@@ -55,27 +57,46 @@ const SearchPage = () => {
     fetchData()
   },[page,searchText])
 
-  console.log("page",page)
-
   const handleFetchMore = ()=>{
     if(totalPage > page){
       setPage(preve => preve + 1)
     }
   }
 
+  const filteredData = selectedCategory 
+    ? data.filter(product => product?.category?.some(cat => cat._id === selectedCategory))
+    : data
+
   return (
     <section className='bg-white'>
       <div className='container mx-auto p-4'>
-        <p className='font-semibold'>Search Results: {data.length}  </p>
+        <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4'>
+          <p className='font-semibold'>Search Results: {filteredData.length}</p>
+          
+          {/* Category Filter */}
+          <div className='flex items-center gap-2'>
+            <label className='text-sm font-medium text-gray-700'>Filter by Category:</label>
+            <select 
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className='px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white'
+            >
+              <option value=''>All Categories</option>
+              {categoryData.map((cat) => (
+                <option key={cat._id} value={cat._id}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
+        </div>
 
         <InfiniteScroll
-              dataLength={data.length}
+              dataLength={filteredData.length}
               hasMore={true}
               next={handleFetchMore}
         >
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 py-4 gap-4'>
               {
-                data.map((p,index)=>{
+                filteredData.map((p,index)=>{
                   return(
                     <CardProduct data={p} key={p?._id+"searchProduct"+index}/>
                   )
@@ -97,7 +118,7 @@ const SearchPage = () => {
 
               {
                 //no data 
-                !data[0] && !loading && (
+                !filteredData[0] && !loading && (
                   <div className='flex flex-col justify-center items-center w-full mx-auto'>
                     <img
                       src={noDataImage} 
