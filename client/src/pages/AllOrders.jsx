@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { FaFilter, FaDownload } from 'react-icons/fa'
+import { FaFilter, FaDownload, FaTrash } from 'react-icons/fa'
 import Axios from '../utils/Axios'
 import SummaryApi from '../common/SummaryApi'
 import { DisplayPriceInRupees } from '../utils/DisplayPriceInRupees'
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
+import toast from 'react-hot-toast'
+import AxiosToastError from '../utils/AxiosToastError'
 
 const AllOrders = () => {
   const [orders, setOrders] = useState([])
@@ -45,6 +47,24 @@ const AllOrders = () => {
       filtered = orders.filter(order => order.payment_status?.toLowerCase() === 'cash on delivery')
     }
     setFilteredOrders(filtered)
+  }
+
+  const deleteOrder = async (orderId) => {
+    if (window.confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
+      try {
+        const response = await Axios({
+          ...SummaryApi.deleteOrder,
+          url: `${SummaryApi.deleteOrder.url}/${orderId}`
+        })
+        
+        if (response.data.success) {
+          toast.success('Order deleted successfully')
+          fetchAllOrders()
+        }
+      } catch (error) {
+        AxiosToastError(error)
+      }
+    }
   }
 
   const exportToPDF = () => {
@@ -148,15 +168,16 @@ const AllOrders = () => {
 
       <div className='bg-white rounded-lg shadow-sm border overflow-hidden'>
         <div className='overflow-x-auto'>
-          <div className='min-w-[800px]'>
+          <div className='min-w-[900px]'>
             <div className='p-3 sm:p-4 border-b bg-gray-50'>
-              <div className='grid grid-cols-6 gap-4 font-semibold text-gray-700 text-xs sm:text-sm'>
+              <div className='grid grid-cols-7 gap-4 font-semibold text-gray-700 text-xs sm:text-sm'>
                 <div>Order ID</div>
                 <div>Customer</div>
                 <div>Items</div>
                 <div>Total Amount</div>
                 <div>Status</div>
                 <div>Date</div>
+                <div>Actions</div>
               </div>
             </div>
 
@@ -164,7 +185,7 @@ const AllOrders = () => {
               {filteredOrders.length > 0 ? (
                 filteredOrders.map((order, index) => (
                   <div key={order._id || index} className='p-3 sm:p-4 hover:bg-gray-50'>
-                    <div className='grid grid-cols-6 gap-4 items-center text-xs sm:text-sm'>
+                    <div className='grid grid-cols-7 gap-4 items-center text-xs sm:text-sm'>
                       <div className='font-mono text-blue-600 truncate'>
                         #{order._id?.slice(-8) || 'N/A'}
                       </div>
@@ -201,6 +222,16 @@ const AllOrders = () => {
                           month: 'short', 
                           day: '2-digit' 
                         }) : 'N/A'}
+                      </div>
+                      
+                      <div>
+                        <button
+                          onClick={() => deleteOrder(order._id)}
+                          className='text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50 transition-colors'
+                          title='Delete Order'
+                        >
+                          <FaTrash size={14} />
+                        </button>
                       </div>
                     </div>
                   </div>

@@ -445,3 +445,32 @@ export async function getSupportedBanksController(request, response) {
         });
     }
 }
+
+export async function deleteOrderController(request, response) {
+    try {
+        const { orderId } = request.params;
+        
+        const deletedOrder = await OrderModel.findByIdAndDelete(orderId);
+        
+        if (!deletedOrder) {
+            return response.status(404).json({
+                message: 'Order not found',
+                error: true,
+                success: false
+            });
+        }
+        
+        return response.json({
+            message: 'Order deleted successfully',
+            error: false,
+            success: true
+        });
+        
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message || error,
+            error: true,
+            success: false
+        });
+    }
+}

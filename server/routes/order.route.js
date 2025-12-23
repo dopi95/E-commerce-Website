@@ -10,7 +10,8 @@ import {
     multiBankPaymentController,
     paymentCallbackController,
     verifyPaymentStatus,
-    getSupportedBanksController
+    getSupportedBanksController,
+    deleteOrderController
 } from '../controllers/order.controller.js'
 
 const orderRouter = Router()
@@ -29,5 +30,6 @@ orderRouter.post('/telebirr/callback', telebirrCallbackController)
 orderRouter.get('/telebirr/verify/:tx_ref', verifyTelebirrPayment)
 orderRouter.get("/order-list",auth,getOrderDetailsController)
 orderRouter.get("/all-orders",auth,getAllOrdersController)
+orderRouter.delete("/delete/:orderId",auth,deleteOrderController)
 
 export default orderRouter

@@ -47,17 +47,15 @@ const UserMenu = ({close}) => {
     <div className='lg:block'>
         {/* Desktop Menu */}
         <div className='hidden lg:block'>
-            {isAdmin(user.role) && (
-                <div className='mb-4 pb-4 border-b'>
-                    <Link to="/dashboard" className='flex items-center gap-2'>
-                        <img src={logo} alt='Fresh Corner Logo' className='h-8 w-8' />
-                        <h1 className='text-lg font-bold'>
-                            <span className='text-green-600'>Fresh</span>
-                            <span className='text-yellow-500'> Corner</span>
-                        </h1>
-                    </Link>
-                </div>
-            )}
+            <div className='mb-4 pb-4 border-b'>
+                <Link to="/dashboard" className='flex items-center gap-2'>
+                    <img src={logo} alt='Fresh Corner Logo' className='h-8 w-8' />
+                    <h1 className='text-lg font-bold'>
+                        <span className='text-green-600'>Fresh</span>
+                        <span className='text-yellow-500'> Corner</span>
+                    </h1>
+                </Link>
+            </div>
             <div className='font-semibold'>My Account</div>
             <div className='text-sm flex items-center gap-2'>
               <span className='max-w-52 text-ellipsis line-clamp-1'>{user.name || user.mobile} <span className='text-medium text-red-600'>{user.role === "ADMIN" ? "(Admin)" : "" }</span></span>
@@ -123,12 +121,6 @@ const UserMenu = ({close}) => {
                     <Link onClick={handleClose} to={"/dashboard/address"} className='px-2 hover:bg-orange-200 py-1'>Save Address</Link>
                   </>
                 )}
-
-                {
-                  isAdmin(user.role) && (
-                    <Link onClick={handleClose} to={"/"} className='mx-2 mt-4 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors duration-200 font-medium text-center border border-green-300'>← Back to Website</Link>
-                  )
-                }
 
                 <button onClick={handleLogout} className='mx-2 mt-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors duration-200 font-medium border border-red-300'>Log Out</button>
             </div>

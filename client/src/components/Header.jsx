@@ -52,13 +52,13 @@ const Header = () => {
     // Show minimal header only when admin is on dashboard pages
     if (isAdmin(user?.role) && location.pathname.startsWith('/dashboard')) {
         return (
-            <header className='w-full lg:h-20 lg:shadow-md sticky top-0 z-40 bg-white'>
-                <div className='w-full flex items-center px-4 justify-between h-16 lg:h-20 min-w-0'>
+            <header className='w-full lg:hidden h-16 shadow-md sticky top-0 z-40 bg-white'>
+                <div className='w-full flex items-center px-4 justify-between h-16 min-w-0'>
                     {/**logo */}
                     <div className='flex items-center min-w-0 flex-1'>
                         <Link to="/dashboard" className='flex justify-center items-center gap-2 min-w-0'>
-                            <img src={logo} alt='Fresh Corner Logo' className='h-8 w-8 lg:h-10 lg:w-10 flex-shrink-0' />
-                            <h1 className='text-lg lg:text-2xl font-bold truncate'>
+                            <img src={logo} alt='Fresh Corner Logo' className='h-8 w-8 flex-shrink-0' />
+                            <h1 className='text-lg font-bold truncate'>
                                 <span className='text-green-600'>Fresh</span>
                                 <span className='text-yellow-500'> Corner</span>
                             </h1>
@@ -66,7 +66,7 @@ const Header = () => {
                     </div>
 
                     {/**Mobile Navigation for Admin Dashboard */}
-                    <div className='lg:hidden flex items-center flex-shrink-0'>
+                    <div className='flex items-center flex-shrink-0'>
                         <button 
                             onClick={()=>setOpenMobileMenu(!openMobileMenu)} 
                             className='p-2 text-gray-700 hover:text-green-600 transition-colors'
@@ -78,7 +78,7 @@ const Header = () => {
 
                 {/**Mobile Menu Overlay for Admin Dashboard */}
                 {openMobileMenu && (
-                    <div className='lg:hidden fixed inset-0 top-16 bg-white z-50 border-t border-gray-100'>
+                    <div className='fixed inset-0 top-16 bg-white z-50 border-t border-gray-100'>
                         <div className='p-4 space-y-2'>
                             <div className='space-y-1 pb-3 border-b border-gray-200'>
                                 <h3 className='font-semibold text-gray-800 px-4 mb-2'>Admin Dashboard</h3>
@@ -144,13 +144,6 @@ const Header = () => {
                                     className='block py-2 px-4 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors'
                                 >
                                     Users
-                                </Link>
-                                <Link 
-                                    to='/' 
-                                    onClick={()=>setOpenMobileMenu(false)}
-                                    className='block py-2 px-4 text-green-700 hover:bg-green-50 rounded-lg font-medium transition-colors'
-                                >
-                                    ← Back to Website
                                 </Link>
                             </div>
                             
@@ -346,13 +339,6 @@ const Header = () => {
                                         className='block py-3 px-4 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors'
                                     >
                                         Users
-                                    </Link>
-                                    <Link 
-                                        to='/' 
-                                        onClick={()=>setOpenMobileMenu(false)}
-                                        className='block py-3 px-4 text-green-700 hover:bg-green-50 rounded-lg font-medium transition-colors'
-                                    >
-                                        ← Back to Website
                                     </Link>
                                 </>
                             ) : (

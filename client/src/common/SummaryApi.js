@@ -162,6 +162,10 @@ const SummaryApi = {
         url : '/api/order/all-orders',
         method : 'get'
     },
+    deleteOrder : {
+        url : '/api/order/delete',
+        method : 'delete'
+    },
     getUserCount : {
         url : '/api/user/user-count',
         method : 'get'
