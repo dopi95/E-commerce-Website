@@ -6,6 +6,7 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import ForgotPassword from "../pages/ForgotPassword";
 import OtpVerification from "../pages/OtpVerification";
+import EmailVerification from "../pages/EmailVerification";
 import ResetPassword from "../pages/ResetPassword";
 import UserMenuMobile from "../pages/UserMenuMobile";
 import Dashboard from "../layouts/Dashboard";
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
             {
                 path : "forgot-password",
                 element : <ForgotPassword/>
+            },
+            {
+                path : "verify-email",
+                element : <EmailVerification/>
             },
             {
                 path : "verification-otp",

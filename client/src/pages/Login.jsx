@@ -44,7 +44,12 @@ const Login = () => {
             })
             
             if(response.data.error){
-                toast.error(response.data.message)
+                if(response.data.needEmailVerification) {
+                    toast.error(response.data.message)
+                    navigate("/verify-email", { state: { email: data.email } })
+                } else {
+                    toast.error(response.data.message)
+                }
             }
 
             if(response.data.success){

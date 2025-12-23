@@ -60,7 +60,7 @@ const Register = () => {
                     password : "",
                     confirmPassword : ""
                 })
-                navigate("/login")
+                navigate("/verify-email", { state: { email: data.email } })
             }
 
         } catch (error) {

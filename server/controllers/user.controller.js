@@ -37,43 +37,46 @@ export async function registerUserController(request,response){
         const salt = await bcryptjs.genSalt(10)
         const hashPassword = await bcryptjs.hash(password,salt)
 
+        const otp = generatedOtp()
+        const expireTime = new Date().getTime() + 15 * 60 * 1000 // 15 minutes from now
+
         const payload = {
             name,
             email,
-            password : hashPassword
+            password : hashPassword,
+            email_verify_otp : otp,
+            email_verify_expiry : new Date(expireTime).toISOString()
         }
 
         const newUser = new UserModel(payload)
         const save = await newUser.save()
 
-        const VerifyEmailUrl = `${process.env.FRONTEND_URL}/verify-email?code=${save?._id}`
-
-        const verifyEmail = await emailService({
-            sendTo : email,
-            subject : "Verify email from Fresh Corner",
-            html : verifyEmailTemplate({
-                name,
-                url : VerifyEmailUrl
-            })
-        })
-
-        // Send welcome email after verification email
         try {
             await emailService({
                 sendTo : email,
-                subject : "Welcome to Fresh Corner! 🥬",
-                html : welcomeEmailTemplate({ name })
+                subject : "Verify Your Email - Fresh Corner",
+                html : verifyEmailTemplate({
+                    name,
+                    otp : otp
+                })
             })
-        } catch (welcomeEmailError) {
-            console.log('Welcome email failed:', welcomeEmailError.message)
-        }
 
-        return response.json({
-            message : "User register successfully",
-            error : false,
-            success : true,
-            data : save
-        })
+            return response.json({
+                message : "Registration successful! Please check your email for verification code.",
+                error : false,
+                success : true,
+                data : { email }
+            })
+        } catch (emailError) {
+            // Delete user if email fails
+            await UserModel.findByIdAndDelete(save._id)
+            
+            return response.status(500).json({
+                message : "Unable to send verification email. Please try again.",
+                error : true,
+                success : false
+            })
+        }
 
     } catch (error) {
         return response.status(500).json({
@@ -86,24 +89,63 @@ export async function registerUserController(request,response){
 
 export async function verifyEmailController(request,response){
     try {
-        const { code } = request.body
+        const { email, otp } = request.body
 
-        const user = await UserModel.findOne({ _id : code})
-
-        if(!user){
+        if(!email || !otp){
             return response.status(400).json({
-                message : "Invalid code",
+                message : "Provide email and OTP",
                 error : true,
                 success : false
             })
         }
 
-        const updateUser = await UserModel.updateOne({ _id : code },{
-            verify_email : true
+        const user = await UserModel.findOne({ email })
+
+        if(!user){
+            return response.status(400).json({
+                message : "User not found",
+                error : true,
+                success : false
+            })
+        }
+
+        const currentTime = new Date().toISOString()
+
+        if(user.email_verify_expiry < currentTime){
+            return response.status(400).json({
+                message : "OTP has expired. Please request a new one.",
+                error : true,
+                success : false
+            })
+        }
+
+        if(otp !== user.email_verify_otp){
+            return response.status(400).json({
+                message : "Invalid OTP",
+                error : true,
+                success : false
+            })
+        }
+
+        const updateUser = await UserModel.updateOne({ email },{
+            verify_email : true,
+            email_verify_otp : null,
+            email_verify_expiry : null
         })
 
+        // Send welcome email after successful verification
+        try {
+            await emailService({
+                sendTo : email,
+                subject : "Welcome to Fresh Corner! 🥬",
+                html : welcomeEmailTemplate({ name: user.name })
+            })
+        } catch (welcomeEmailError) {
+            console.log('Welcome email failed:', welcomeEmailError.message)
+        }
+
         return response.json({
-            message : "Verify email done",
+            message : "Email verified successfully! You can now login.",
             success : true,
             error : false
         })
@@ -111,7 +153,77 @@ export async function verifyEmailController(request,response){
         return response.status(500).json({
             message : error.message || error,
             error : true,
-            success : true
+            success : false
+        })
+    }
+}
+
+export async function resendEmailVerificationOtp(request, response) {
+    try {
+        const { email } = request.body
+
+        if (!email) {
+            return response.status(400).json({
+                message: "Email is required",
+                error: true,
+                success: false
+            })
+        }
+
+        const user = await UserModel.findOne({ email })
+
+        if (!user) {
+            return response.status(400).json({
+                message: "User not found",
+                error: true,
+                success: false
+            })
+        }
+
+        if (user.verify_email) {
+            return response.status(400).json({
+                message: "Email is already verified",
+                error: true,
+                success: false
+            })
+        }
+
+        const otp = generatedOtp()
+        const expireTime = new Date().getTime() + 15 * 60 * 1000 // 15 minutes from now
+
+        await UserModel.updateOne({ email }, {
+            email_verify_otp: otp,
+            email_verify_expiry: new Date(expireTime).toISOString()
+        })
+
+        try {
+            await emailService({
+                sendTo: email,
+                subject: "Verify Your Email - Fresh Corner",
+                html: verifyEmailTemplate({
+                    name: user.name,
+                    otp: otp
+                })
+            })
+
+            return response.json({
+                message: "Verification code sent to your email",
+                error: false,
+                success: true
+            })
+        } catch (emailError) {
+            return response.status(500).json({
+                message: "Unable to send verification email. Please try again.",
+                error: true,
+                success: false
+            })
+        }
+
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message || error,
+            error: true,
+            success: false
         })
     }
 }
@@ -137,6 +249,15 @@ export async function loginController(request,response){
                 message : "User not register",
                 error : true,
                 success : false
+            })
+        }
+
+        if(!user.verify_email){
+            return response.status(400).json({
+                message : "Please verify your email first",
+                error : true,
+                success : false,
+                needEmailVerification: true
             })
         }
 
