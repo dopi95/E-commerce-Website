@@ -78,7 +78,12 @@ const Home = () => {
                       
                       <div className='flex flex-col sm:flex-row gap-3 justify-center'>
                           <button 
-                              onClick={() => navigate('/search')}
+                              onClick={() => {
+                                  const categorySection = document.querySelector('#category-section')
+                                  if (categorySection) {
+                                      categorySection.scrollIntoView({ behavior: 'smooth' })
+                                  }
+                              }}
                               className='bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2'
                           >
                               <BsCart4 />
@@ -128,7 +133,7 @@ const Home = () => {
       </div>
       
       {/* Categories Section */}
-      <div className='container mx-auto px-4 py-8 lg:py-12'>
+      <div id='category-section' className='container mx-auto px-4 py-8 lg:py-12'>
           <div className='text-center mb-8 lg:mb-10'>
               <h2 className='text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 lg:mb-3'>Shop by Category</h2>
               <p className='text-base lg:text-lg max-w-2xl mx-auto' style={{color: '#1f2937'}}>Select a category to explore fresh products</p>

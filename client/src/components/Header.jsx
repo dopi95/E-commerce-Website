@@ -227,34 +227,27 @@ const Header = () => {
                     )
                 }
                 {!isAdmin(user?.role) && (
-                    <button onClick={()=>setOpenCartSection(true)} className='flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-white transition-colors'>
-                        <div className='animate-bounce'>
-                            <BsCart4 size={20}/>
-                        </div>
-                        <div className='font-medium text-sm'>
-                            {
-                                cartItem[0] ? (
-                                    <div>
-                                        <p>{totalQty} Items</p>
-                                        <p>{DisplayPriceInRupees(totalPrice)}</p>
-                                    </div>
-                                ) : (
-                                    <p>My Cart</p>
-                                )
-                            }
-                        </div>    
+                    <button onClick={()=>setOpenCartSection(true)} className='relative p-2'>
+                        <BsCart4 size={28} className='text-gray-700 animate-bounce'/>
+                        {totalQty > 0 && (
+                            <span className='absolute -top-1 -right-1 bg-green-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium'>
+                                {totalQty}
+                            </span>
+                        )}
                     </button>
                 )}
             </div>
 
             {/**Mobile Navigation */}
             <div className='lg:hidden flex items-center gap-3 flex-shrink-0'>
-                {!isAdmin(user?.role) && cartItem[0] && (
+                {!isAdmin(user?.role) && (
                     <button onClick={()=>setOpenCartSection(true)} className='relative p-2'>
-                        <BsCart4 size={24} className='text-gray-700'/>
-                        <span className='absolute -top-1 -right-1 bg-green-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium'>
-                            {totalQty}
-                        </span>
+                        <BsCart4 size={24} className='text-gray-700 animate-bounce'/>
+                        {totalQty > 0 && (
+                            <span className='absolute -top-1 -right-1 bg-green-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium'>
+                                {totalQty}
+                            </span>
+                        )}
                     </button>
                 )}
                 
