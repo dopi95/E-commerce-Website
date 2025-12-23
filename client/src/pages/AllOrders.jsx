@@ -109,29 +109,29 @@ const AllOrders = () => {
   }
 
   return (
-    <div className='p-6'>
-      <div className='mb-6'>
-        <h1 className='text-2xl font-bold text-gray-800'>All Orders Management</h1>
-        <p className='text-gray-600'>Manage all customer orders from your store</p>
+    <div className='w-full max-w-full'>
+      <div className='mb-4 sm:mb-6'>
+        <h1 className='text-xl sm:text-2xl font-bold text-gray-800'>All Orders Management</h1>
+        <p className='text-gray-600 text-sm sm:text-base'>Manage all customer orders from your store</p>
       </div>
 
       {/* Filter and Export Controls */}
-      <div className='mb-6 flex flex-wrap gap-4 items-center justify-between bg-white p-4 rounded-lg shadow-sm border'>
-        <div className='flex items-center gap-4'>
-          <div className='flex items-center gap-2'>
-            <FaFilter className='text-gray-500' />
-            <label className='text-sm font-medium text-gray-700'>Filter by Payment:</label>
+      <div className='mb-4 sm:mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-white p-3 sm:p-4 rounded-lg shadow-sm border'>
+        <div className='flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto'>
+          <div className='flex items-center gap-2 w-full sm:w-auto'>
+            <FaFilter className='text-gray-500 flex-shrink-0' />
+            <label className='text-xs sm:text-sm font-medium text-gray-700 flex-shrink-0'>Filter:</label>
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className='px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500'
+              className='px-2 sm:px-3 py-1 sm:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-xs sm:text-sm flex-1 sm:flex-none'
             >
               <option value='all'>All Orders</option>
               <option value='paid'>Paid Orders</option>
               <option value='cod'>Cash on Delivery</option>
             </select>
           </div>
-          <div className='text-sm text-gray-600'>
+          <div className='text-xs sm:text-sm text-gray-600'>
             Showing {filteredOrders.length} of {orders.length} orders
           </div>
         </div>
@@ -139,111 +139,115 @@ const AllOrders = () => {
         <button
           onClick={exportToPDF}
           disabled={filteredOrders.length === 0}
-          className='flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed'
+          className='flex items-center gap-2 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm w-full sm:w-auto justify-center'
         >
           <FaDownload />
           Export PDF
         </button>
       </div>
 
-      <div className='bg-white rounded-lg shadow-sm border'>
-        <div className='p-4 border-b bg-gray-50'>
-          <div className='grid grid-cols-6 gap-4 font-semibold text-gray-700 text-sm'>
-            <div>Order ID</div>
-            <div>Customer</div>
-            <div>Items</div>
-            <div>Total Amount</div>
-            <div>Status</div>
-            <div>Date</div>
-          </div>
-        </div>
+      <div className='bg-white rounded-lg shadow-sm border overflow-hidden'>
+        <div className='overflow-x-auto'>
+          <div className='min-w-[800px]'>
+            <div className='p-3 sm:p-4 border-b bg-gray-50'>
+              <div className='grid grid-cols-6 gap-4 font-semibold text-gray-700 text-xs sm:text-sm'>
+                <div>Order ID</div>
+                <div>Customer</div>
+                <div>Items</div>
+                <div>Total Amount</div>
+                <div>Status</div>
+                <div>Date</div>
+              </div>
+            </div>
 
-        <div className='divide-y'>
-          {filteredOrders.length > 0 ? (
-            filteredOrders.map((order, index) => (
-              <div key={order._id || index} className='p-4 hover:bg-gray-50'>
-                <div className='grid grid-cols-6 gap-4 items-center text-sm'>
-                  <div className='font-mono text-blue-600'>
-                    #{order._id?.slice(-8) || 'N/A'}
-                  </div>
-                  
-                  <div>
-                    <div className='font-medium'>{order.userId?.name || 'Guest User'}</div>
-                    <div className='text-gray-500 text-xs'>{order.userId?.email || 'No email provided'}</div>
-                  </div>
-                  
-                  <div>
-                    <div className='font-medium'>1 item</div>
-                    <div className='text-gray-500 text-xs'>
-                      {order.product_details?.name || 'Product'}
+            <div className='divide-y'>
+              {filteredOrders.length > 0 ? (
+                filteredOrders.map((order, index) => (
+                  <div key={order._id || index} className='p-3 sm:p-4 hover:bg-gray-50'>
+                    <div className='grid grid-cols-6 gap-4 items-center text-xs sm:text-sm'>
+                      <div className='font-mono text-blue-600 truncate'>
+                        #{order._id?.slice(-8) || 'N/A'}
+                      </div>
+                      
+                      <div className='min-w-0'>
+                        <div className='font-medium truncate'>{order.userId?.name || 'Guest User'}</div>
+                        <div className='text-gray-500 text-xs truncate'>{order.userId?.email || 'No email provided'}</div>
+                      </div>
+                      
+                      <div className='min-w-0'>
+                        <div className='font-medium'>1 item</div>
+                        <div className='text-gray-500 text-xs truncate'>
+                          {order.product_details?.name || 'Product'}
+                        </div>
+                      </div>
+                      
+                      <div className='font-semibold text-green-600'>
+                        {DisplayPriceInRupees(order.totalAmt || 0)}
+                      </div>
+                      
+                      <div>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          order.payment_status?.toLowerCase() === 'paid' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {order.payment_status || 'Pending'}
+                        </span>
+                      </div>
+                      
+                      <div className='text-gray-600 text-xs sm:text-sm'>
+                        {order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-US', { 
+                          year: 'numeric', 
+                          month: 'short', 
+                          day: '2-digit' 
+                        }) : 'N/A'}
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className='font-semibold text-green-600'>
-                    {DisplayPriceInRupees(order.totalAmt || 0)}
+                ))
+              ) : (
+                <div className='p-8 text-center text-gray-500'>
+                  <div className='mb-4'>
+                    <svg className='mx-auto h-12 w-12 text-gray-400' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' />
+                    </svg>
                   </div>
-                  
-                  <div>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      order.payment_status?.toLowerCase() === 'paid' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {order.payment_status || 'Pending'}
-                    </span>
-                  </div>
-                  
-                  <div className='text-gray-600'>
-                    {order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'short', 
-                      day: '2-digit' 
-                    }) : 'N/A'}
-                  </div>
+                  <h3 className='text-lg font-medium text-gray-900 mb-2'>No orders found</h3>
+                  <p className='text-gray-500'>
+                    {filter === 'all' ? 'Orders from customers will appear here.' :
+                     filter === 'paid' ? 'No paid orders found.' :
+                     'No cash on delivery orders found.'}
+                  </p>
                 </div>
-              </div>
-            ))
-          ) : (
-            <div className='p-8 text-center text-gray-500'>
-              <div className='mb-4'>
-                <svg className='mx-auto h-12 w-12 text-gray-400' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' />
-                </svg>
-              </div>
-              <h3 className='text-lg font-medium text-gray-900 mb-2'>No orders found</h3>
-              <p className='text-gray-500'>
-                {filter === 'all' ? 'Orders from customers will appear here.' :
-                 filter === 'paid' ? 'No paid orders found.' :
-                 'No cash on delivery orders found.'}
-              </p>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
 
       {filteredOrders.length > 0 && (
-        <div className='mt-6 bg-white rounded-lg shadow-sm border p-4'>
-          <h3 className='text-lg font-semibold text-gray-800 mb-4'>Order Summary</h3>
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-            <div className='text-center p-4 bg-blue-50 rounded-lg'>
-              <div className='text-2xl font-bold text-blue-600'>{filteredOrders.length}</div>
-              <div className='text-blue-600 text-sm'>
+        <div className='mt-4 sm:mt-6 bg-white rounded-lg shadow-sm border p-3 sm:p-4'>
+          <h3 className='text-base sm:text-lg font-semibold text-gray-800 mb-4'>Order Summary</h3>
+          <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
+            <div className='text-center p-3 sm:p-4 bg-blue-50 rounded-lg'>
+              <div className='text-xl sm:text-2xl font-bold text-blue-600'>{filteredOrders.length}</div>
+              <div className='text-blue-600 text-xs sm:text-sm'>
                 {filter === 'all' ? 'Total Orders' :
                  filter === 'paid' ? 'Paid Orders' :
                  'COD Orders'}
               </div>
             </div>
-            <div className='text-center p-4 bg-green-50 rounded-lg'>
-              <div className='text-2xl font-bold text-green-600'>
+            <div className='text-center p-3 sm:p-4 bg-green-50 rounded-lg'>
+              <div className='text-xl sm:text-2xl font-bold text-green-600'>
                 {filteredOrders.filter(order => order.payment_status?.toLowerCase() === 'paid').length}
               </div>
-              <div className='text-green-600 text-sm'>Paid Orders</div>
+              <div className='text-green-600 text-xs sm:text-sm'>Paid Orders</div>
             </div>
-            <div className='text-center p-4 bg-orange-50 rounded-lg'>
-              <div className='text-2xl font-bold text-orange-600'>
+            <div className='text-center p-3 sm:p-4 bg-orange-50 rounded-lg'>
+              <div className='text-xl sm:text-2xl font-bold text-orange-600'>
                 {DisplayPriceInRupees(filteredOrders.reduce((sum, order) => sum + (order.totalAmt || 0), 0))}
               </div>
-              <div className='text-orange-600 text-sm'>Total Revenue</div>
+              <div className='text-orange-600 text-xs sm:text-sm'>Total Revenue</div>
             </div>
           </div>
         </div>

@@ -141,10 +141,10 @@ const ContactAdmin = () => {
     }, []);
 
     return (
-        <div className='p-6'>
-            <div className='flex justify-between items-center mb-6'>
-                <h1 className='text-2xl font-bold text-gray-800'>Contact Messages</h1>
-                <div className='flex gap-4 text-sm'>
+        <div className='w-full max-w-full'>
+            <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4'>
+                <h1 className='text-xl sm:text-2xl font-bold text-gray-800'>Contact Messages</h1>
+                <div className='flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm'>
                     <div className='flex items-center gap-2'>
                         <span className='w-3 h-3 bg-red-500 rounded-full'></span>
                         <span>New ({contacts.filter(c => c.status === 'new').length})</span>
@@ -167,88 +167,90 @@ const ContactAdmin = () => {
             ) : (
                 <div className='bg-white rounded-lg shadow overflow-hidden'>
                     <div className='overflow-x-auto'>
-                        <table className='min-w-full divide-y divide-gray-200'>
-                            <thead className='bg-gray-50'>
-                                <tr>
-                                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                                        Contact Info
-                                    </th>
-                                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                                        Subject
-                                    </th>
-                                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                                        Status
-                                    </th>
-                                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                                        Date
-                                    </th>
-                                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className='bg-white divide-y divide-gray-200'>
-                                {contacts.map((contact) => (
-                                    <tr key={contact._id} className='hover:bg-gray-50'>
-                                        <td className='px-6 py-4 whitespace-nowrap'>
-                                            <div>
-                                                <div className='text-sm font-medium text-gray-900'>{contact.name}</div>
-                                                <div className='text-sm text-gray-500 flex items-center gap-1'>
-                                                    <FaEnvelope size={12} />
-                                                    {contact.email}
-                                                </div>
-                                                <div className='text-sm text-gray-500 flex items-center gap-1'>
-                                                    <FaPhone size={12} />
-                                                    {contact.phone}
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className='px-6 py-4'>
-                                            <div className='text-sm text-gray-900'>{contact.subject}</div>
-                                            <div className='text-sm text-gray-500 truncate max-w-xs'>
-                                                {contact.message}
-                                            </div>
-                                        </td>
-                                        <td className='px-6 py-4 whitespace-nowrap'>
-                                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(contact.status)}`}>
-                                                {contact.status.charAt(0).toUpperCase() + contact.status.slice(1)}
-                                            </span>
-                                        </td>
-                                        <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                                            <div className='flex items-center gap-1'>
-                                                <FaCalendarAlt size={12} />
-                                                {formatDate(contact.createdAt)}
-                                            </div>
-                                        </td>
-                                        <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
-                                            <div className='flex gap-2'>
-                                                <button
-                                                    onClick={() => openModal(contact)}
-                                                    className='text-blue-600 hover:text-blue-900 p-1'
-                                                    title='View Details'
-                                                >
-                                                    <FaEye />
-                                                </button>
-                                                <button
-                                                    onClick={() => openReplyModal(contact)}
-                                                    className='text-green-600 hover:text-green-900 p-1'
-                                                    title='Reply via Email'
-                                                >
-                                                    <FaEnvelope />
-                                                </button>
-                                                <button
-                                                    onClick={() => deleteContact(contact._id)}
-                                                    className='text-red-600 hover:text-red-900 p-1'
-                                                    title='Delete'
-                                                >
-                                                    <FaTrash />
-                                                </button>
-                                            </div>
-                                        </td>
+                        <div className='min-w-[800px]'>
+                            <table className='w-full divide-y divide-gray-200'>
+                                <thead className='bg-gray-50'>
+                                    <tr>
+                                        <th className='px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                                            Contact Info
+                                        </th>
+                                        <th className='px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                                            Subject
+                                        </th>
+                                        <th className='px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                                            Status
+                                        </th>
+                                        <th className='px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                                            Date
+                                        </th>
+                                        <th className='px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                                            Actions
+                                        </th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className='bg-white divide-y divide-gray-200'>
+                                    {contacts.map((contact) => (
+                                        <tr key={contact._id} className='hover:bg-gray-50'>
+                                            <td className='px-3 sm:px-6 py-4 whitespace-nowrap'>
+                                                <div>
+                                                    <div className='text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[150px]'>{contact.name}</div>
+                                                    <div className='text-xs text-gray-500 flex items-center gap-1 truncate max-w-[150px]'>
+                                                        <FaEnvelope size={10} />
+                                                        {contact.email}
+                                                    </div>
+                                                    <div className='text-xs text-gray-500 flex items-center gap-1'>
+                                                        <FaPhone size={10} />
+                                                        {contact.phone}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className='px-3 sm:px-6 py-4'>
+                                                <div className='text-xs sm:text-sm text-gray-900 truncate max-w-[200px]'>{contact.subject}</div>
+                                                <div className='text-xs text-gray-500 truncate max-w-[200px]'>
+                                                    {contact.message}
+                                                </div>
+                                            </td>
+                                            <td className='px-3 sm:px-6 py-4 whitespace-nowrap'>
+                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(contact.status)}`}>
+                                                    {contact.status.charAt(0).toUpperCase() + contact.status.slice(1)}
+                                                </span>
+                                            </td>
+                                            <td className='px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500'>
+                                                <div className='flex items-center gap-1'>
+                                                    <FaCalendarAlt size={10} />
+                                                    <span className='truncate'>{formatDate(contact.createdAt)}</span>
+                                                </div>
+                                            </td>
+                                            <td className='px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium'>
+                                                <div className='flex gap-1 sm:gap-2'>
+                                                    <button
+                                                        onClick={() => openModal(contact)}
+                                                        className='text-blue-600 hover:text-blue-900 p-1'
+                                                        title='View Details'
+                                                    >
+                                                        <FaEye size={14} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => openReplyModal(contact)}
+                                                        className='text-green-600 hover:text-green-900 p-1'
+                                                        title='Reply via Email'
+                                                    >
+                                                        <FaEnvelope size={14} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => deleteContact(contact._id)}
+                                                        className='text-red-600 hover:text-red-900 p-1'
+                                                        title='Delete'
+                                                    >
+                                                        <FaTrash size={14} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     {contacts.length === 0 && (
