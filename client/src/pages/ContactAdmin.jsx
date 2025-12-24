@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import Axios from '../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
 import AxiosToastError from '../utils/AxiosToastError';
+import DisplayTable from '../components/DisplayTable';
+import { createColumnHelper } from '@tanstack/react-table';
 
 const ContactAdmin = () => {
     const [contacts, setContacts] = useState([]);
@@ -13,6 +15,7 @@ const ContactAdmin = () => {
     const [showReplyModal, setShowReplyModal] = useState(false);
     const [replyMessage, setReplyMessage] = useState('');
     const [sendingReply, setSendingReply] = useState(false);
+    const columnHelper = createColumnHelper();
 
     const fetchContacts = async () => {
         try {
@@ -136,6 +139,81 @@ const ContactAdmin = () => {
         });
     };
 
+    const columns = [
+        columnHelper.accessor('name', {
+            header: 'Contact Info',
+            cell: ({ row }) => (
+                <div>
+                    <div className='font-medium text-sm'>{row.original.name}</div>
+                    <div className='text-xs text-gray-500 flex items-center gap-1'>
+                        <FaEnvelope size={10} />
+                        {row.original.email}
+                    </div>
+                    <div className='text-xs text-gray-500 flex items-center gap-1'>
+                        <FaPhone size={10} />
+                        {row.original.phone}
+                    </div>
+                </div>
+            )
+        }),
+        columnHelper.accessor('subject', {
+            header: 'Subject',
+            cell: ({ row }) => (
+                <div>
+                    <div className='text-sm font-medium'>{row.original.subject}</div>
+                    <div className='text-xs text-gray-500 truncate max-w-[200px]'>
+                        {row.original.message}
+                    </div>
+                </div>
+            )
+        }),
+        columnHelper.accessor('status', {
+            header: 'Status',
+            cell: ({ row }) => (
+                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(row.original.status)}`}>
+                    {row.original.status.charAt(0).toUpperCase() + row.original.status.slice(1)}
+                </span>
+            )
+        }),
+        columnHelper.accessor('createdAt', {
+            header: 'Date',
+            cell: ({ row }) => (
+                <div className='text-sm flex items-center gap-1'>
+                    <FaCalendarAlt size={10} />
+                    {formatDate(row.original.createdAt)}
+                </div>
+            )
+        }),
+        columnHelper.accessor('actions', {
+            header: 'Actions',
+            cell: ({ row }) => (
+                <div className='flex gap-2'>
+                    <button
+                        onClick={() => openModal(row.original)}
+                        className='p-2 bg-blue-100 rounded-full text-blue-600 hover:text-blue-800'
+                        title='View Details'
+                    >
+                        <FaEye size={14} />
+                    </button>
+                    <button
+                        onClick={() => openReplyModal(row.original)}
+                        className='p-2 bg-green-100 rounded-full text-green-600 hover:text-green-800'
+                        title='Reply via Email'
+                    >
+                        <FaEnvelope size={14} />
+                    </button>
+                    <button
+                        onClick={() => deleteContact(row.original._id)}
+                        className='p-2 bg-red-100 rounded-full text-red-600 hover:text-red-800'
+                        title='Delete'
+                    >
+                        <FaTrash size={14} />
+                    </button>
+                </div>
+            )
+        })
+    ];
+
     useEffect(() => {
         fetchContacts();
     }, []);
@@ -165,101 +243,11 @@ const ContactAdmin = () => {
                     <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-green-600'></div>
                 </div>
             ) : (
-                <div className='bg-white rounded-lg shadow overflow-hidden'>
-                    <div className='overflow-x-auto'>
-                        <div className='min-w-[800px]'>
-                            <table className='w-full divide-y divide-gray-200'>
-                                <thead className='bg-gray-50'>
-                                    <tr>
-                                        <th className='px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                                            Contact Info
-                                        </th>
-                                        <th className='px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                                            Subject
-                                        </th>
-                                        <th className='px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                                            Status
-                                        </th>
-                                        <th className='px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                                            Date
-                                        </th>
-                                        <th className='px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                                            Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className='bg-white divide-y divide-gray-200'>
-                                    {contacts.map((contact) => (
-                                        <tr key={contact._id} className='hover:bg-gray-50'>
-                                            <td className='px-3 sm:px-6 py-4 whitespace-nowrap'>
-                                                <div>
-                                                    <div className='text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[150px]'>{contact.name}</div>
-                                                    <div className='text-xs text-gray-500 flex items-center gap-1 truncate max-w-[150px]'>
-                                                        <FaEnvelope size={10} />
-                                                        {contact.email}
-                                                    </div>
-                                                    <div className='text-xs text-gray-500 flex items-center gap-1'>
-                                                        <FaPhone size={10} />
-                                                        {contact.phone}
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className='px-3 sm:px-6 py-4'>
-                                                <div className='text-xs sm:text-sm text-gray-900 truncate max-w-[200px]'>{contact.subject}</div>
-                                                <div className='text-xs text-gray-500 truncate max-w-[200px]'>
-                                                    {contact.message}
-                                                </div>
-                                            </td>
-                                            <td className='px-3 sm:px-6 py-4 whitespace-nowrap'>
-                                                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(contact.status)}`}>
-                                                    {contact.status.charAt(0).toUpperCase() + contact.status.slice(1)}
-                                                </span>
-                                            </td>
-                                            <td className='px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500'>
-                                                <div className='flex items-center gap-1'>
-                                                    <FaCalendarAlt size={10} />
-                                                    <span className='truncate'>{formatDate(contact.createdAt)}</span>
-                                                </div>
-                                            </td>
-                                            <td className='px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium'>
-                                                <div className='flex gap-1 sm:gap-2'>
-                                                    <button
-                                                        onClick={() => openModal(contact)}
-                                                        className='text-blue-600 hover:text-blue-900 p-1'
-                                                        title='View Details'
-                                                    >
-                                                        <FaEye size={14} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => openReplyModal(contact)}
-                                                        className='text-green-600 hover:text-green-900 p-1'
-                                                        title='Reply via Email'
-                                                    >
-                                                        <FaEnvelope size={14} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => deleteContact(contact._id)}
-                                                        className='text-red-600 hover:text-red-900 p-1'
-                                                        title='Delete'
-                                                    >
-                                                        <FaTrash size={14} />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    {contacts.length === 0 && (
-                        <div className='text-center py-12'>
-                            <FaEnvelope className='mx-auto h-12 w-12 text-gray-400' />
-                            <h3 className='mt-2 text-sm font-medium text-gray-900'>No contacts</h3>
-                            <p className='mt-1 text-sm text-gray-500'>No contact messages have been received yet.</p>
-                        </div>
-                    )}
+                <div className='overflow-auto w-full max-w-[95vw]'>
+                    <DisplayTable
+                        data={contacts}
+                        column={columns}
+                    />
                 </div>
             )}
 

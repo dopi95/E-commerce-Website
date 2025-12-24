@@ -10,7 +10,7 @@ const CartMobile = () => {
   }
   
   return (
-    <DisplayCartItem close={handleClose}/>
+    <DisplayCartItem close={handleClose} isCartPage={true}/>
   )
 }
 

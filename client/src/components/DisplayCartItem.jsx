@@ -10,21 +10,27 @@ import { pricewithDiscount } from '../utils/PriceWithDiscount'
 import imageEmpty from '../assets/empty_cart.webp'
 import toast from 'react-hot-toast'
 
-const DisplayCartItem = ({close}) => {
+const DisplayCartItem = ({close, isCartPage}) => {
     const { notDiscountTotalPrice, totalPrice ,totalQty} = useGlobalContext()
     const cartItem  = useSelector(state => state.cartItem.cart)
     const user = useSelector(state => state.user)
     const navigate = useNavigate()
 
     const redirectToCheckoutPage = ()=>{
+        console.log('User:', user) // Debug log
+        console.log('User ID:', user?._id) // Debug log
+        
         if(user?._id){
+            console.log('Navigating to checkout') // Debug log
             navigate("/checkout")
-            if(close){
+            // Only close if it's not the cart page
+            if(close && !isCartPage){
                 close()
             }
             return
         }
-        toast("Please Login")
+        console.log('User not logged in, showing toast') // Debug log
+        toast.error("Please login to proceed to checkout")
     }
   return (
     <section className='bg-neutral-900 fixed top-0 bottom-0 right-0 left-0 bg-opacity-70 z-50'>

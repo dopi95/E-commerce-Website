@@ -3,6 +3,8 @@ import { FaFilter, FaDownload, FaTrash } from 'react-icons/fa'
 import Axios from '../utils/Axios'
 import SummaryApi from '../common/SummaryApi'
 import { DisplayPriceInRupees } from '../utils/DisplayPriceInRupees'
+import DisplayTable from '../components/DisplayTable'
+import { createColumnHelper } from '@tanstack/react-table'
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
 import toast from 'react-hot-toast'
@@ -13,6 +15,7 @@ const AllOrders = () => {
   const [filteredOrders, setFilteredOrders] = useState([])
   const [loading, setLoading] = useState(false)
   const [filter, setFilter] = useState('all')
+  const columnHelper = createColumnHelper()
 
   useEffect(() => {
     fetchAllOrders()
@@ -66,6 +69,76 @@ const AllOrders = () => {
       }
     }
   }
+
+  const columns = [
+    columnHelper.accessor('_id', {
+      header: 'Order ID',
+      cell: ({ row }) => (
+        <span className='font-mono text-blue-600'>
+          #{row.original._id?.slice(-8) || 'N/A'}
+        </span>
+      )
+    }),
+    columnHelper.accessor('userId.name', {
+      header: 'Customer',
+      cell: ({ row }) => (
+        <div>
+          <div className='font-medium'>{row.original.userId?.name || 'Guest User'}</div>
+          <div className='text-gray-500 text-xs'>{row.original.userId?.email || 'No email'}</div>
+        </div>
+      )
+    }),
+    columnHelper.accessor('product_details.name', {
+      header: 'Product',
+      cell: ({ row }) => (
+        <div className='text-sm'>{row.original.product_details?.name || 'Product'}</div>
+      )
+    }),
+    columnHelper.accessor('totalAmt', {
+      header: 'Amount',
+      cell: ({ row }) => (
+        <span className='font-semibold text-green-600'>
+          {DisplayPriceInRupees(row.original.totalAmt || 0)}
+        </span>
+      )
+    }),
+    columnHelper.accessor('payment_status', {
+      header: 'Status',
+      cell: ({ row }) => (
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+          row.original.payment_status?.toLowerCase() === 'paid' 
+            ? 'bg-green-100 text-green-800' 
+            : 'bg-yellow-100 text-yellow-800'
+        }`}>
+          {row.original.payment_status || 'Pending'}
+        </span>
+      )
+    }),
+    columnHelper.accessor('createdAt', {
+      header: 'Date',
+      cell: ({ row }) => (
+        <div className='text-sm'>
+          {row.original.createdAt ? new Date(row.original.createdAt).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: '2-digit' 
+          }) : 'N/A'}
+        </div>
+      )
+    }),
+    columnHelper.accessor('actions', {
+      header: 'Actions',
+      cell: ({ row }) => (
+        <button
+          onClick={() => deleteOrder(row.original._id)}
+          className='p-2 bg-red-100 rounded-full text-red-500 hover:text-red-600'
+          title='Delete Order'
+        >
+          <FaTrash size={16} />
+        </button>
+      )
+    })
+  ]
 
   const exportToPDF = () => {
     const doc = new jsPDF()
@@ -159,101 +232,18 @@ const AllOrders = () => {
         <button
           onClick={exportToPDF}
           disabled={filteredOrders.length === 0}
-          className='flex items-center gap-2 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm w-full sm:w-auto justify-center'
+          className='flex items-center gap-2 px-3 sm:px-4 py-2 border-2 border-yellow-500 text-yellow-600 rounded-md hover:bg-yellow-500 hover:text-white hover:font-bold disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm w-full sm:w-auto justify-center transition-all'
         >
           <FaDownload />
           Export PDF
         </button>
       </div>
 
-      <div className='bg-white rounded-lg shadow-sm border overflow-hidden'>
-        <div className='overflow-x-auto'>
-          <div className='min-w-[900px]'>
-            <div className='p-3 sm:p-4 border-b bg-gray-50'>
-              <div className='grid grid-cols-7 gap-4 font-semibold text-gray-700 text-xs sm:text-sm'>
-                <div>Order ID</div>
-                <div>Customer</div>
-                <div>Items</div>
-                <div>Total Amount</div>
-                <div>Status</div>
-                <div>Date</div>
-                <div>Actions</div>
-              </div>
-            </div>
-
-            <div className='divide-y'>
-              {filteredOrders.length > 0 ? (
-                filteredOrders.map((order, index) => (
-                  <div key={order._id || index} className='p-3 sm:p-4 hover:bg-gray-50'>
-                    <div className='grid grid-cols-7 gap-4 items-center text-xs sm:text-sm'>
-                      <div className='font-mono text-blue-600 truncate'>
-                        #{order._id?.slice(-8) || 'N/A'}
-                      </div>
-                      
-                      <div className='min-w-0'>
-                        <div className='font-medium truncate'>{order.userId?.name || 'Guest User'}</div>
-                        <div className='text-gray-500 text-xs truncate'>{order.userId?.email || 'No email provided'}</div>
-                      </div>
-                      
-                      <div className='min-w-0'>
-                        <div className='font-medium'>1 item</div>
-                        <div className='text-gray-500 text-xs truncate'>
-                          {order.product_details?.name || 'Product'}
-                        </div>
-                      </div>
-                      
-                      <div className='font-semibold text-green-600'>
-                        {DisplayPriceInRupees(order.totalAmt || 0)}
-                      </div>
-                      
-                      <div>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          order.payment_status?.toLowerCase() === 'paid' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {order.payment_status || 'Pending'}
-                        </span>
-                      </div>
-                      
-                      <div className='text-gray-600 text-xs sm:text-sm'>
-                        {order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-US', { 
-                          year: 'numeric', 
-                          month: 'short', 
-                          day: '2-digit' 
-                        }) : 'N/A'}
-                      </div>
-                      
-                      <div>
-                        <button
-                          onClick={() => deleteOrder(order._id)}
-                          className='text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50 transition-colors'
-                          title='Delete Order'
-                        >
-                          <FaTrash size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className='p-8 text-center text-gray-500'>
-                  <div className='mb-4'>
-                    <svg className='mx-auto h-12 w-12 text-gray-400' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' />
-                    </svg>
-                  </div>
-                  <h3 className='text-lg font-medium text-gray-900 mb-2'>No orders found</h3>
-                  <p className='text-gray-500'>
-                    {filter === 'all' ? 'Orders from customers will appear here.' :
-                     filter === 'paid' ? 'No paid orders found.' :
-                     'No cash on delivery orders found.'}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+      <div className='overflow-auto w-full max-w-[95vw]'>
+        <DisplayTable
+          data={filteredOrders}
+          column={columns}
+        />
       </div>
 
       {filteredOrders.length > 0 && (
