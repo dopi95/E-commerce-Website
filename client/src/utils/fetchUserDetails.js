@@ -13,7 +13,12 @@ const fetchUserDetails = async()=>{
         })
         return response.data
     } catch (error) {
-        console.log(error)
+        // Silently handle authentication errors
+        if (error.response?.status === 401) {
+            // Clear invalid tokens
+            localStorage.removeItem('accesstoken')
+            localStorage.removeItem('refreshToken')
+        }
         return null
     }
 }

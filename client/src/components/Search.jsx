@@ -29,7 +29,7 @@ const Search = () => {
     }
 
   return (
-    <div className='w-full h-10 lg:h-12 rounded-xl border border-gray-200 overflow-hidden flex items-center text-gray-500 bg-gray-50 hover:bg-white hover:border-green-300 transition-all duration-200 focus-within:border-green-500 focus-within:bg-white focus-within:shadow-md'>
+    <div className={`w-full h-10 lg:h-12 rounded-xl border border-gray-200 overflow-hidden flex items-center text-gray-500 bg-gray-50 hover:bg-white hover:border-green-300 transition-all duration-200 focus-within:border-green-500 focus-within:bg-white focus-within:shadow-md ${isSearchPage && isMobile ? 'relative z-50' : ''}`}>
         <div className='flex-shrink-0'>
             {
                 (isMobile && isSearchPage ) ? (

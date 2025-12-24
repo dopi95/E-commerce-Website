@@ -48,6 +48,13 @@ const Header = () => {
         }
         navigate("/dashboard/profile")
     }
+
+    // Close mobile menu when navigating to search page
+    useEffect(() => {
+        if (isSearchPage) {
+            setOpenMobileMenu(false)
+        }
+    }, [isSearchPage])
     
     // Show minimal header only when admin is on dashboard pages
     if (isAdmin(user?.role) && location.pathname.startsWith('/dashboard')) {
@@ -261,14 +268,14 @@ const Header = () => {
         </div>
 
         {/**Mobile Search Bar */}
-        {!isSearchPage && location.pathname === "/" && (
+        {((!isSearchPage && location.pathname === "/") || isSearchPage) && (
             <div className='lg:hidden px-4 py-3'>
                 <Search/>
             </div>
         )}
 
         {/**Mobile Menu Overlay */}
-        {openMobileMenu && (
+        {openMobileMenu && !isSearchPage && (
             <div className='lg:hidden fixed inset-0 top-16 bg-white z-50 border-t border-gray-100'>
                 <div className='p-4 space-y-4'>
                     {/* Dashboard Menu Items */}
