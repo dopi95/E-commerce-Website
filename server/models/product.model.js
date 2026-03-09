@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const productSchema = new mongoose.Schema({
     name : {
         type : String,
+        index: true
     },
     image : {
         type : Array,
@@ -11,13 +12,15 @@ const productSchema = new mongoose.Schema({
     category : [
         {
             type : mongoose.Schema.ObjectId,
-            ref : 'category'
+            ref : 'category',
+            index: true
         }
     ],
     subCategory : [
         {
             type : mongoose.Schema.ObjectId,
-            ref : 'subCategory'
+            ref : 'subCategory',
+            index: true
         }
     ],
     unit : {
@@ -30,7 +33,8 @@ const productSchema = new mongoose.Schema({
     },
     price : {
         type : Number,
-        defualt : null
+        defualt : null,
+        index: true
     },
     discount : {
         type : Number,
@@ -46,21 +50,16 @@ const productSchema = new mongoose.Schema({
     },
     publish : {
         type : Boolean,
-        default : true
+        default : true,
+        index: true
     }
 },{
     timestamps : true
 })
 
-//create a text index
-productSchema.index({
-    name  : "text",
-    description : 'text'
-},{
-    name : 10,
-    description : 5
-})
-
+productSchema.index({ name: "text", description: 'text' }, { weights: { name: 10, description: 5 } });
+productSchema.index({ createdAt: -1 });
+productSchema.index({ price: 1, discount: -1 });
 
 const ProductModel = mongoose.model('product',productSchema)
 

@@ -10,7 +10,11 @@ if(!process.env.MONGODB_URI){
 
 async function connectDB(){
     try {
-        await mongoose.connect(process.env.MONGODB_URI)
+        await mongoose.connect(process.env.MONGODB_URI, {
+            maxPoolSize: 10,
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+        })
         console.log("MongoDB Connected Successfully")
     } catch (error) {
         console.log("Mongodb connect error",error)

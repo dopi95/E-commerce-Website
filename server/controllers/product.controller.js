@@ -1,4 +1,6 @@
 import ProductModel from "../models/product.model.js";
+import { getCache, setCache, clearCache } from "../utils/cache.js";
+import { sampleProducts } from "../data/sampleProducts.js";
 
 export const createProductController = async(request,response)=>{
     try {
@@ -36,6 +38,7 @@ export const createProductController = async(request,response)=>{
             more_details,
         })
         const saveProduct = await product.save()
+        clearCache();
 
         return response.json({
             message : "Product Created Successfully",
@@ -55,38 +58,44 @@ export const createProductController = async(request,response)=>{
 
 export const getProductController = async(request,response)=>{
     try {
-        
         let { page, limit, search } = request.body 
 
-        if(!page){
-            page = 1
+        if(!page) page = 1
+        if(!limit) limit = 10
+
+        const cacheKey = `products_${page}_${limit}_${search || 'all'}`;
+        const cached = getCache(cacheKey);
+        
+        if (cached) {
+            return response.json(cached);
         }
 
-        if(!limit){
-            limit = 10
-        }
+        const query = search ? { $text : { $search : search } } : {};
+        const skip = (page - 1) * limit;
 
-        const query = search ? {
-            $text : {
-                $search : search
-            }
-        } : {}
-
-        const skip = (page - 1) * limit
-
-        const [data,totalCount] = await Promise.all([
-            ProductModel.find(query).sort({createdAt : -1 }).skip(skip).limit(limit).populate('category subCategory'),
+        const [data, totalCount] = await Promise.all([
+            ProductModel.find(query)
+                .select('name image price discount unit stock description')
+                .sort({createdAt : -1})
+                .skip(skip)
+                .limit(limit)
+                .populate('category', 'name')
+                .populate('subCategory', 'name')
+                .lean(),
             ProductModel.countDocuments(query)
-        ])
+        ]);
 
-        return response.json({
+        const result = {
             message : "Product data",
             error : false,
             success : true,
-            totalCount : totalCount,
-            totalNoPage : Math.ceil( totalCount / limit),
-            data : data
-        })
+            totalCount,
+            totalNoPage : Math.ceil(totalCount / limit),
+            data
+        };
+
+        setCache(cacheKey, result);
+        return response.json(result);
     } catch (error) {
         return response.status(500).json({
             message : error.message || error,
@@ -108,16 +117,24 @@ export const getProductByCategory = async(request,response)=>{
             })
         }
 
-        const product = await ProductModel.find({ 
-            category : { $in : id }
-        }).limit(15)
+        const cacheKey = `category_${id}`;
+        const cached = getCache(cacheKey);
+        if (cached) return response.json(cached);
 
-        return response.json({
+        const product = await ProductModel.find({ category : { $in : id } })
+            .select('name image price discount unit stock')
+            .limit(15)
+            .lean();
+
+        const result = {
             message : "category product list",
             data : product,
             error : false,
             success : true
-        })
+        };
+
+        setCache(cacheKey, result);
+        return response.json(result);
     } catch (error) {
         return response.status(500).json({
             message : error.message || error,
@@ -129,7 +146,7 @@ export const getProductByCategory = async(request,response)=>{
 
 export const getProductByCategoryAndSubCategory  = async(request,response)=>{
     try {
-        const { categoryId,subCategoryId,page,limit } = request.body
+        let { categoryId,subCategoryId,page,limit } = request.body
 
         if(!categoryId || !subCategoryId){
             return response.status(400).json({
@@ -139,35 +156,42 @@ export const getProductByCategoryAndSubCategory  = async(request,response)=>{
             })
         }
 
-        if(!page){
-            page = 1
-        }
+        if(!page) page = 1
+        if(!limit) limit = 10
 
-        if(!limit){
-            limit = 10
-        }
+        const cacheKey = `cat_sub_${categoryId}_${subCategoryId}_${page}_${limit}`;
+        const cached = getCache(cacheKey);
+        if (cached) return response.json(cached);
 
         const query = {
             category : { $in :categoryId  },
             subCategory : { $in : subCategoryId }
-        }
+        };
 
-        const skip = (page - 1) * limit
+        const skip = (page - 1) * limit;
 
         const [data,dataCount] = await Promise.all([
-            ProductModel.find(query).sort({createdAt : -1 }).skip(skip).limit(limit),
+            ProductModel.find(query)
+                .select('name image price discount unit stock')
+                .sort({createdAt : -1})
+                .skip(skip)
+                .limit(limit)
+                .lean(),
             ProductModel.countDocuments(query)
-        ])
+        ]);
 
-        return response.json({
+        const result = {
             message : "Product list",
-            data : data,
+            data,
             totalCount : dataCount,
-            page : page,
-            limit : limit,
+            page,
+            limit,
             success : true,
             error : false
-        })
+        };
+
+        setCache(cacheKey, result);
+        return response.json(result);
 
     } catch (error) {
         return response.status(500).json({
@@ -217,6 +241,7 @@ export const updateProductDetails = async(request,response)=>{
         const updateProduct = await ProductModel.updateOne({ _id : _id },{
             ...request.body
         })
+        clearCache();
 
         return response.json({
             message : "updated successfully",
@@ -248,6 +273,7 @@ export const deleteProductDetails = async(request,response)=>{
         }
 
         const deleteProduct = await ProductModel.deleteOne({_id : _id })
+        clearCache();
 
         return response.json({
             message : "Delete successfully",
@@ -269,37 +295,41 @@ export const searchProduct = async(request,response)=>{
     try {
         let { search, page , limit } = request.body 
 
-        if(!page){
-            page = 1
-        }
-        if(!limit){
-            limit  = 10
-        }
+        if(!page) page = 1
+        if(!limit) limit = 10
 
-        const query = search ? {
-            $text : {
-                $search : search
-            }
-        } : {}
+        const cacheKey = `search_${search}_${page}_${limit}`;
+        const cached = getCache(cacheKey);
+        if (cached) return response.json(cached);
 
-        const skip = ( page - 1) * limit
+        const query = search ? { $text : { $search : search } } : {};
+        const skip = (page - 1) * limit;
 
         const [data,dataCount] = await Promise.all([
-            ProductModel.find(query).sort({ createdAt  : -1 }).skip(skip).limit(limit).populate('category subCategory'),
+            ProductModel.find(query)
+                .select('name image price discount unit stock description')
+                .sort({ createdAt : -1 })
+                .skip(skip)
+                .limit(limit)
+                .populate('category', 'name')
+                .populate('subCategory', 'name')
+                .lean(),
             ProductModel.countDocuments(query)
-        ])
+        ]);
 
-        return response.json({
+        const result = {
             message : "Product data",
             error : false,
             success : true,
-            data : data,
+            data,
             totalCount :dataCount,
             totalPage : Math.ceil(dataCount/limit),
-            page : page,
-            limit : limit 
-        })
+            page,
+            limit 
+        };
 
+        setCache(cacheKey, result);
+        return response.json(result);
 
     } catch (error) {
         return response.status(500).json({

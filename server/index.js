@@ -5,6 +5,7 @@ dotenv.config()
 import cookieParser from 'cookie-parser'
 import morgan from 'morgan'
 import helmet from 'helmet'
+import compression from 'compression'
 import connectDB from './config/connectDB.js'
 import userRouter from './routes/user.route.js'
 import categoryRouter from './routes/category.route.js'
@@ -15,15 +16,17 @@ import cartRouter from './routes/cart.route.js'
 import addressRouter from './routes/address.route.js'
 import orderRouter from './routes/order.route.js'
 import contactRouter from './routes/contact.route.js'
+import healthRouter from './routes/health.route.js'
 
 const app = express()
+app.use(compression())
 app.use(cors({
     credentials : true,
     origin : process.env.NODE_ENV === 'production' 
         ? ['https://freshcorner.vercel.app', 'https://fresh-corner-backend.onrender.com']
         : process.env.FRONTEND_URL
 }))
-app.use(express.json())
+app.use(express.json({ limit: '10mb' }))
 app.use(cookieParser())
 app.use(morgan('dev'))
 app.use(helmet({
@@ -33,7 +36,6 @@ app.use(helmet({
 const PORT = process.env.PORT || 8080 
 
 app.get("/",(request,response)=>{
-    ///server to client
     response.json({
         message : "Server is running " + PORT
     })
@@ -48,6 +50,7 @@ app.use("/api/cart",cartRouter)
 app.use("/api/address",addressRouter)
 app.use('/api/order',orderRouter)
 app.use('/api/contact',contactRouter)
+app.use('/api',healthRouter)
 
 connectDB().then(()=>{
     app.listen(PORT,()=>{
