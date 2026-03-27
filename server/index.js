@@ -20,11 +20,15 @@ import healthRouter from './routes/health.route.js'
 
 const app = express()
 app.use(compression())
+const allowedOrigins = [
+    'https://freshcorner.vercel.app',
+    'https://fresh-corner-backend.onrender.com',
+    process.env.FRONTEND_URL
+].filter(Boolean)
+
 app.use(cors({
     credentials : true,
-    origin : process.env.NODE_ENV === 'production' 
-        ? ['https://freshcorner.vercel.app', 'https://fresh-corner-backend.onrender.com']
-        : process.env.FRONTEND_URL
+    origin : allowedOrigins
 }))
 app.use(express.json({ limit: '10mb' }))
 app.use(cookieParser())
